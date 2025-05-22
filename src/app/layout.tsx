@@ -3,7 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/providers/ReduxProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+// Load Inter font with variable to prevent hydration issues
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap', // Add display swap for better performance
+  variable: '--font-inter', // Use CSS variable approach instead of className
+});
 
 export const metadata: Metadata = {
   title: "Decant Perfumes | Premium Fragrance Collection",
@@ -16,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={inter.variable}>
+      <body className="font-sans antialiased">
         <ReduxProvider>
           {children}
         </ReduxProvider>
