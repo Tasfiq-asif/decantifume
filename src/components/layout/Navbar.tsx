@@ -20,7 +20,7 @@ import { useAppSelector } from '@/lib/hooks/reduxHooks';
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'Shop', href: '/shop' },
+
   { name: 'Collections', href: '/collections' },
   { name: 'About Us', href: '/about' },
   { name: 'Contact', href: '/contact' },
