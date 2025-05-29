@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { ReactNode } from 'react';
-import { Navbar } from './Navbar';
-import { Footer } from './Footer';
+import { ReactNode } from "react";
+import { Navbar } from "./Navbar";
+import { Footer } from "./Footer";
 
 interface SiteLayoutProps {
   children: ReactNode;
@@ -16,4 +16,4 @@ export function SiteLayout({ children }: SiteLayoutProps) {
       <Footer />
     </div>
   );
-} 
+}

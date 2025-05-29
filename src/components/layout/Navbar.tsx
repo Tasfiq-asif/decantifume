@@ -1,37 +1,33 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ShoppingCart, Menu, Search, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger 
-} from '@/components/ui/sheet';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ShoppingCart, Menu, Search, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { useAppSelector } from '@/lib/hooks/reduxHooks';
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/lib/hooks/reduxHooks";
 
 const navigation = [
-  { name: 'Home', href: '/' },
+  { name: "Home", href: "/" },
 
-  { name: 'Collections', href: '/collections' },
-  { name: 'About Us', href: '/about' },
-  { name: 'Contact', href: '/contact' },
+  { name: "Collections", href: "/collections" },
+  { name: "About Us", href: "/about" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
-  const { totalItems } = useAppSelector(state => state.cart);
+  const { totalItems } = useAppSelector((state) => state.cart);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
       <div className="container flex h-16 items-center">
         <Sheet>
           <SheetTrigger asChild>
@@ -47,7 +43,9 @@ export function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={`text-sm font-medium transition-colors hover:text-primary ${
-                    pathname === item.href ? 'text-primary' : 'text-muted-foreground'
+                    pathname === item.href
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {item.name}
@@ -67,7 +65,9 @@ export function Navbar() {
                 key={item.name}
                 href={item.href}
                 className={`transition-colors hover:text-primary ${
-                  pathname === item.href ? 'text-primary' : 'text-muted-foreground'
+                  pathname === item.href
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 }`}
               >
                 {item.name}
@@ -88,7 +88,7 @@ export function Navbar() {
               <span className="sr-only">Search</span>
             </Button>
           </div>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -98,20 +98,28 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
-                <Link href="/account" className="w-full">My Account</Link>
+                <Link href="/account" className="w-full">
+                  My Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/orders" className="w-full">Orders</Link>
+                <Link href="/orders" className="w-full">
+                  Orders
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/wishlist" className="w-full">Wishlist</Link>
+                <Link href="/wishlist" className="w-full">
+                  Wishlist
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/login" className="w-full">Sign In</Link>
+                <Link href="/login" className="w-full">
+                  Sign In
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
+
           <Button variant="ghost" size="icon" className="relative" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
@@ -127,4 +135,4 @@ export function Navbar() {
       </div>
     </header>
   );
-} 
+}
