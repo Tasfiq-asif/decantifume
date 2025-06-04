@@ -1,6 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 import { combineReducers } from "@reduxjs/toolkit";
 
 // Import slices (we'll create these next)
@@ -15,30 +13,18 @@ const rootReducer = combineReducers({
   ui: uiSlice,
 });
 
-// Persist configuration
-const persistConfig = {
-  key: "root",
-  storage,
-  // Only persist cart and auth data
-  whitelist: ["cart", "auth"],
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 // Configure store
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
+        // Ignore these action types for serialization checks
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     }),
   devTools: process.env.NODE_ENV !== "production",
 });
-
-// Create persistor
-export const persistor = persistStore(store);
 
 // Export types
 export type RootState = ReturnType<typeof store.getState>;
