@@ -111,114 +111,117 @@ export default function LoginPage() {
           </div>
 
           <Card>
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`pl-10 ${
-                      formErrors.email ? "border-destructive" : ""
-                    }`}
-                    disabled={isLoading}
-                  />
+            <CardHeader>
+              <CardTitle>Sign In</CardTitle>
+              <CardDescription>
+                Enter your credentials to access your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={`pl-10 ${
+                        formErrors.email ? "border-destructive" : ""
+                      }`}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {formErrors.email && (
+                    <p className="text-sm text-destructive">
+                      {formErrors.email}
+                    </p>
+                  )}
                 </div>
-                {formErrors.email && (
-                  <p className="text-sm text-destructive">{formErrors.email}</p>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`pl-10 pr-10 ${
-                      formErrors.password ? "border-destructive" : ""
-                    }`}
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    disabled={isLoading}
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className={`pl-10 pr-10 ${
+                        formErrors.password ? "border-destructive" : ""
+                      }`}
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                      disabled={isLoading}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {formErrors.password && (
+                    <p className="text-sm text-destructive">
+                      {formErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                {error && (
+                  <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                    <p className="text-sm text-destructive">{error}</p>
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
+
+                <div className="text-center">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-primary hover:underline"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
+                    Forgot your password?
+                  </Link>
                 </div>
-                {formErrors.password && (
-                  <p className="text-sm text-destructive">
-                    {formErrors.password}
-                  </p>
-                )}
+              </form>
+
+              <Separator className="my-6" />
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Don&apos;t have an account?
+                </p>
+                <Button variant="outline" asChild className="w-full">
+                  <Link href="/register">Create Account</Link>
+                </Button>
               </div>
 
-              {error && (
-                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
-                  <p className="text-sm text-destructive">{error}</p>
-                </div>
-              )}
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
-              </Button>
-
-              <div className="text-center">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Forgot your password?
-                </Link>
+              <div className="mt-4 p-3 bg-muted/50 rounded-md">
+                <p className="text-xs text-muted-foreground text-center">
+                  Demo credentials: test@example.com / password
+                </p>
               </div>
-            </form>
-
-            <Separator className="my-6" />
-
-            <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?
-              </p>
-              <Button variant="outline" asChild className="w-full">
-                <Link href="/register">Create Account</Link>
-              </Button>
-            </div>
-
-            <div className="mt-4 p-3 bg-muted/50 rounded-md">
-              <p className="text-xs text-muted-foreground text-center">
-                Demo credentials: test@example.com / password
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </SiteLayout>
   );
