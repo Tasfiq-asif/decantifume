@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
@@ -99,16 +100,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight">DECANT</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Welcome back! Please sign in to your account.
-          </p>
-        </div>
+    <SiteLayout>
+      <div className="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-200px)]">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight">DECANT</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Welcome back! Please sign in to your account.
+            </p>
+          </div>
 
-        <Card>
+          <Card>
           <CardHeader>
             <CardTitle>Sign In</CardTitle>
             <CardDescription>
@@ -218,6 +220,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </SiteLayout>
   );
 }
