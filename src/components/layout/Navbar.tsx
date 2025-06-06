@@ -12,11 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useAppSelector } from "@/lib/hooks/reduxHooks";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/reduxHooks";
+import { logoutUser } from "@/lib/api/authApi";
 
 const navigation = [
   { name: "Home", href: "/" },
-
   { name: "Collections", href: "/collections" },
   { name: "About Us", href: "/about" },
   { name: "Contact", href: "/contact" },
@@ -24,7 +24,13 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { totalItems } = useAppSelector((state) => state.cart);
+  const dispatch = useAppDispatch();
+  const { totalQuantity } = useAppSelector((state) => state.cart);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
