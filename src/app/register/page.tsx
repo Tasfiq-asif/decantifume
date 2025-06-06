@@ -105,7 +105,8 @@ export default function RegisterPage() {
     }
 
     try {
-      const { confirmPassword: _, ...registrationData } = formData;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...registrationData } = formData;
       await dispatch(registerUser(registrationData)).unwrap();
       router.push("/");
     } catch (error) {
