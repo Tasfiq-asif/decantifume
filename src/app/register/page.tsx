@@ -105,7 +105,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const { confirmPassword, ...registrationData } = formData;
+      const { confirmPassword: _, ...registrationData } = formData;
       await dispatch(registerUser(registrationData)).unwrap();
       router.push("/");
     } catch (error) {

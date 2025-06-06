@@ -203,7 +203,7 @@ export default function LoginPage() {
 
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?
+                Don&apos;t have an account?
               </p>
               <Button variant="outline" asChild className="w-full">
                 <Link href="/register">Create Account</Link>

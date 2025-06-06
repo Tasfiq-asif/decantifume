@@ -103,35 +103,53 @@ export function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Link href="/account" className="w-full">
-                  My Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/orders" className="w-full">
-                  Orders
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/wishlist" className="w-full">
-                  Wishlist
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/login" className="w-full">
-                  Sign In
-                </Link>
-              </DropdownMenuItem>
+              {isAuthenticated ? (
+                <>
+                  <DropdownMenuItem>
+                    <span className="text-sm font-medium">{user?.name}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/account" className="w-full">
+                      My Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/orders" className="w-full">
+                      Orders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/wishlist" className="w-full">
+                      Wishlist
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <span className="w-full">Sign Out</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem>
+                    <Link href="/login" className="w-full">
+                      Sign In
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/register" className="w-full">
+                      Create Account
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Button variant="ghost" size="icon" className="relative" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
+              {totalQuantity > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {totalItems}
+                  {totalQuantity}
                 </span>
               )}
               <span className="sr-only">Cart</span>
