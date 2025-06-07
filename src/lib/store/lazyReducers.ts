@@ -1,4 +1,4 @@
-import { combineReducers, Reducer } from "@reduxjs/toolkit";
+import { Reducer } from "@reduxjs/toolkit";
 import { store } from "../store";
 
 // Define the shape of our lazy reducers
@@ -16,6 +16,7 @@ const lazyReducers: LazyReducers = {
 
 // Track which reducers have been loaded
 const loadedReducers = new Set<string>();
+const asyncReducers: Record<string, Reducer> = {};
 
 // Function to dynamically load and inject a reducer
 export const injectReducer = async (key: string) => {
@@ -27,13 +28,22 @@ export const injectReducer = async (key: string) => {
     const reducerModule = await lazyReducers[key]();
     const reducer = reducerModule.default;
 
-    // Get current reducers
-    const currentReducers = store.getState();
+    // Add to async reducers
+    asyncReducers[key] = reducer;
 
-    // Create new root reducer with the injected reducer
+    // Get the current root reducer and replace it
+    const { combineReducers } = await import("@reduxjs/toolkit");
+
+    // Import core reducers
+    const authSlice = (await import("../slices/authSlice")).default;
+    const cartSlice = (await import("../slices/cartSlice")).default;
+    const uiSlice = (await import("../slices/uiSlice")).default;
+
     const newRootReducer = combineReducers({
-      ...currentReducers,
-      [key]: reducer,
+      auth: authSlice,
+      cart: cartSlice,
+      ui: uiSlice,
+      ...asyncReducers,
     });
 
     // Replace the reducer in the store
