@@ -1,21 +1,28 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "@reduxjs/toolkit";
 
-// Import slices (we'll create these next)
+// Import core slices (always loaded)
 import authSlice from "./slices/authSlice";
 import cartSlice from "./slices/cartSlice";
 import uiSlice from "./slices/uiSlice";
 
-// Combine reducers
-const rootReducer = combineReducers({
+// Core reducers that are always loaded
+const coreReducers = {
   auth: authSlice,
   cart: cartSlice,
   ui: uiSlice,
-});
+};
+
+// Create initial root reducer with core reducers
+const createRootReducer = (asyncReducers = {}) =>
+  combineReducers({
+    ...coreReducers,
+    ...asyncReducers,
+  });
 
 // Configure store
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: createRootReducer(),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
