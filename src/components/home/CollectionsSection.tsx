@@ -23,7 +23,7 @@ const collections = [
     title: "Niche",
     description: "Exclusive artisan perfumes",
     image:
-      "https://images.unsplash.com/photo-1583513364301-f9339bc6452c?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3",
+      "https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3",
     link: "/collections/niche",
   },
 ];
@@ -65,7 +65,7 @@ const titleVariants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: "power3.out",
+      ease: "easeOut",
     },
   },
 };
@@ -100,7 +100,7 @@ export function CollectionsSection() {
           y: 0,
           scale: 1,
           duration: 1,
-          ease: "power3.out",
+          ease: "easeOut",
         }
       );
 
@@ -119,7 +119,7 @@ export function CollectionsSection() {
           rotationY: 0,
           scale: 1,
           duration: 1.2,
-          ease: "power3.out",
+          ease: "easeOut",
           stagger: 0.2,
         },
         "-=0.5"
@@ -192,7 +192,7 @@ export function CollectionsSection() {
                 <motion.div
                   className="relative h-[300px] overflow-hidden"
                   whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.6, ease: "power2.out" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                 >
                   <motion.div
                     style={{ y: index === 0 ? y1 : y2 }}

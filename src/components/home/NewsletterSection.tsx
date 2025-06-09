@@ -101,7 +101,7 @@ export function NewsletterSection() {
           scale: 1,
           rotationX: 0,
           duration: 1.2,
-          ease: "back.out(1.7)",
+          ease: "easeOut",
         }
       );
 
@@ -119,7 +119,7 @@ export function NewsletterSection() {
             y: 0,
             scale: 1,
             duration: 0.8,
-            ease: "power3.out",
+            ease: "easeOut",
             stagger: 0.1,
           },
           "-=0.6"

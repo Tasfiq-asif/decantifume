@@ -29,7 +29,7 @@ export function HeroSection() {
         y: 0,
         scale: 1,
         duration: 1.2,
-        ease: "power3.out",
+        ease: "easeOut",
       }
     )
       .fromTo(
@@ -42,7 +42,7 @@ export function HeroSection() {
           opacity: 1,
           y: 0,
           duration: 1,
-          ease: "power2.out",
+          ease: "easeOut",
         },
         "-=0.6"
       )
@@ -56,7 +56,7 @@ export function HeroSection() {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power2.out",
+          ease: "easeOut",
         },
         "-=0.4"
       );
@@ -65,7 +65,7 @@ export function HeroSection() {
     gsap.to(backgroundRef.current, {
       y: "+=20",
       duration: 4,
-      ease: "power1.inOut",
+      ease: "easeInOut",
       yoyo: true,
       repeat: -1,
     });
@@ -115,7 +115,7 @@ export function HeroSection() {
                 transition={{
                   delay: 0.3 + index * 0.2,
                   duration: 0.8,
-                  ease: "power3.out",
+                  ease: "easeOut",
                 }}
               >
                 {word}
@@ -131,7 +131,7 @@ export function HeroSection() {
                 transition={{
                   delay: 0.8 + index * 0.1,
                   duration: 0.6,
-                  ease: "power2.out",
+                  ease: "easeOut",
                 }}
               >
                 {word}

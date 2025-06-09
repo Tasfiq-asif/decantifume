@@ -110,7 +110,7 @@ export function FeaturesSection() {
           y: 0,
           rotationX: 0,
           duration: 1,
-          ease: "power3.out",
+          ease: "easeOut",
           stagger: 0.15,
         }
       );
@@ -119,7 +119,7 @@ export function FeaturesSection() {
       gsap.to(".feature-icon", {
         y: "+=8",
         duration: 2,
-        ease: "power1.inOut",
+        ease: "easeInOut",
         yoyo: true,
         repeat: -1,
         stagger: 0.3,

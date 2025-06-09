@@ -4,15 +4,16 @@ import "./globals.css";
 import { ReduxProvider } from "@/lib/providers/ReduxProvider";
 
 // Load Inter font with variable to prevent hydration issues
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
-  display: 'swap', // Add display swap for better performance
-  variable: '--font-inter', // Use CSS variable approach instead of className
+  display: "swap", // Add display swap for better performance
+  variable: "--font-inter", // Use CSS variable approach instead of className
 });
 
 export const metadata: Metadata = {
   title: "Decant Perfumes | Premium Fragrance Collection",
-  description: "Shop premium decant perfumes and fragrances at affordable prices. Experience luxury scents without the full bottle commitment.",
+  description:
+    "Shop premium decant perfumes and fragrances at affordable prices. Experience luxury scents without the full bottle commitment.",
 };
 
 export default function RootLayout({
@@ -22,10 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased">
-        <ReduxProvider>
-          {children}
-        </ReduxProvider>
+      <body className="font-sans antialiased" suppressHydrationWarning={true}>
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );

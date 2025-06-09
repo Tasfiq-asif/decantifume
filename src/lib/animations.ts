@@ -1,14 +1,18 @@
 // Animation utilities for consistent motion design across the app
 import { Variants, Transition } from "framer-motion";
 
-// Common easing functions
+// Common easing functions (Framer Motion compatible)
 export const easings = {
   power1: [0.25, 0.46, 0.45, 0.94],
-  power2: [0.25, 0.46, 0.45, 0.94],
+  power2: [0.455, 0.03, 0.515, 0.955],
   power3: [0.215, 0.61, 0.355, 1],
   power4: [0.77, 0, 0.175, 1],
   back: [0.68, -0.55, 0.265, 1.55],
   elastic: [0.175, 0.885, 0.32, 1.275],
+  easeOut: "easeOut",
+  easeIn: "easeIn",
+  easeInOut: "easeInOut",
+  linear: "linear",
 } as const;
 
 // Common transition configurations

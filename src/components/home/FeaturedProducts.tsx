@@ -48,7 +48,7 @@ const featuredProducts: Product[] = [
       "A luxurious and sensual fragrance with notes of black truffle, ylang-ylang, bergamot, and blackcurrant.",
     price: 22.99,
     image:
-      "https://images.unsplash.com/photo-1590736969297-8d5848b10042?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
+      "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
     sizes: [
       { id: "3-10ml", size: "10ml", price: 22.99 },
       { id: "3-30ml", size: "30ml", price: 54.99 },
@@ -107,7 +107,7 @@ const headerVariants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: "power3.out",
+      ease: "easeOut",
     },
   },
 };
@@ -136,7 +136,7 @@ export function FeaturedProducts() {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power3.out",
+          ease: "easeOut",
         }
       );
 
@@ -153,7 +153,7 @@ export function FeaturedProducts() {
           y: 0,
           scale: 1,
           duration: 0.8,
-          ease: "power3.out",
+          ease: "easeOut",
           stagger: 0.15,
         },
         "-=0.4"

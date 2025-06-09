@@ -120,3 +120,41 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Animation utilities to prevent hydration issues */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .will-change-auto {
+    will-change: auto;
+  }
+
+  /* Prevent layout shifts during animations */
+  .animation-safe {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  /* Smooth scrolling for parallax effects */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
