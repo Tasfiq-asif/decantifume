@@ -3,6 +3,10 @@
 import { ProductCard, Product } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 // Mock data for featured products
 const featuredProducts: Product[] = [
@@ -67,30 +71,163 @@ const featuredProducts: Product[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+    scale: 0.9,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const headerVariants = {
+  hidden: { opacity: 0, y: -30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: "power3.out",
+    },
+  },
+};
+
 export function FeaturedProducts() {
+  const [ref, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
+
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (inView && headerRef.current && gridRef.current) {
+      const tl = gsap.timeline();
+
+      // Animate header
+      tl.fromTo(
+        headerRef.current,
+        {
+          opacity: 0,
+          y: -50,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+        }
+      );
+
+      // Animate grid items with stagger
+      tl.fromTo(
+        ".product-card",
+        {
+          opacity: 0,
+          y: 60,
+          scale: 0.8,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.15,
+        },
+        "-=0.4"
+      );
+    }
+  }, [inView]);
+
   return (
-    <section className="py-16">
+    <motion.section
+      ref={ref}
+      className="py-16"
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={containerVariants}
+    >
       <div className="max-w-[1600px] mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10">
-          <div>
+        <motion.div
+          ref={headerRef}
+          className="flex flex-col md:flex-row justify-between items-center mb-10"
+          variants={headerVariants}
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
             <h2 className="text-3xl font-bold tracking-tight mb-2">
               Featured Perfumes
             </h2>
             <p className="text-muted-foreground">
               Our most popular scents, carefully selected for you
             </p>
-          </div>
-          <Button variant="outline" className="mt-4 md:mt-0" asChild>
-            <Link href="/shop">View All Products</Link>
-          </Button>
-        </div>
+          </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button variant="outline" className="mt-4 md:mt-0" asChild>
+              <Link href="/shop">View All Products</Link>
+            </Button>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+        >
+          {featuredProducts.map((product, index) => (
+            <motion.div
+              key={product.id}
+              className="product-card"
+              variants={itemVariants}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                transition: {
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 17,
+                },
+              }}
+              whileTap={{ scale: 0.98 }}
+              custom={index}
+            >
+              <ProductCard product={product} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
