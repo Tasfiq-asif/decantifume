@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/providers/ReduxProvider";
 
-// Load Inter font with variable to prevent hydration issues
-const inter = Inter({
+// Load Roboto font with variable to prevent hydration issues
+const roboto = Roboto({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700"], // Include common font weights
   display: "swap", // Add display swap for better performance
-  variable: "--font-inter", // Use CSS variable approach instead of className
+  variable: "--font-roboto", // Use CSS variable approach instead of className
 });
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={roboto.variable}>
       <body className="font-sans antialiased" suppressHydrationWarning={true}>
         <ReduxProvider>{children}</ReduxProvider>
       </body>
