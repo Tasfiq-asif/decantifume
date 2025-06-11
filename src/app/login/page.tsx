@@ -101,16 +101,22 @@ export default function LoginPage() {
 
   return (
     <SiteLayout>
-      <div className="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-200px)]">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center bg-gradient-to-br from-dark-purple-950 via-dark-purple-900 to-dark-purple-800 py-12 px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-200px)] relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-radial-lavender opacity-30" />
+        <div className="absolute inset-0 bg-subtle-glow opacity-20" />
+
+        <div className="max-w-md w-full space-y-8 relative z-10">
           <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight">DECANT</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-lavender-100 via-lavender-200 to-lavender-300 bg-clip-text text-transparent">
+              DECANT
+            </h2>
+            <p className="mt-2 text-sm text-lavender-200">
               Welcome back! Please sign in to your account.
             </p>
           </div>
 
-          <Card>
+          <Card className="glass-effect border-lavender-400/20 shadow-lavender-soft backdrop-blur-xl">
             <CardHeader>
               <CardTitle>Sign In</CardTitle>
               <CardDescription>

@@ -150,7 +150,7 @@ export function NewsletterSection() {
       animate={inView ? "visible" : "hidden"}
       variants={containerVariants}
     >
-      <div className="container">
+      <div>
         <div className="max-w-3xl mx-auto text-center">
           <motion.h2
             ref={titleRef}

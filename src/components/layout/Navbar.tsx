@@ -34,7 +34,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
-      <div className="container flex h-16 items-center">
+      <div className=" flex h-16 items-center ">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
@@ -61,7 +61,7 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
 
-        <div className="mr-4 flex">
+        <div className="mr-4 flex ">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold text-xl">DECANT</span>
           </Link>
@@ -82,7 +82,7 @@ export function Navbar() {
           </nav>
         </div>
 
-        <div className="flex-1 items-center justify-end flex space-x-2">
+        <div className="flex-1 items-center justify-end  flex space-x-2">
           <div className="hidden md:flex w-full max-w-sm items-center space-x-2 mr-4">
             <Input
               type="search"
