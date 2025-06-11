@@ -23,8 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={roboto.variable}>
-      <body className="font-sans antialiased" suppressHydrationWarning={true}>
+    <html lang="en" className={`dark ${roboto.variable}`}>
+      <body
+        className="font-sans antialiased bg-background text-foreground min-h-screen"
+        suppressHydrationWarning={true}
+      >
         <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>

@@ -74,7 +74,7 @@ export function HeroSection() {
   return (
     <motion.section
       ref={containerRef}
-      className="relative min-h-[70vh] flex items-center px-8 mx-auto overflow-hidden"
+      className="relative min-h-[70vh] flex items-center px-8 mx-auto overflow-hidden bg-gradient-to-br from-dark-purple-950 via-dark-purple-900 to-dark-purple-800"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -89,20 +89,26 @@ export function HeroSection() {
           alt="Luxury perfumes"
           fill
           priority
-          className="object-cover brightness-[0.85] scale-110"
+          className="object-cover brightness-[0.4] scale-110 opacity-60"
         />
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-dark-purple-950/80 via-dark-purple-900/60 to-transparent"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
         />
+        <motion.div
+          className="absolute inset-0 bg-radial-lavender"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1.2 }}
+        />
       </motion.div>
 
       <div className="relative z-10 py-20">
-        <div className="max-w-2xl text-white">
+        <div className="max-w-2xl text-lavender-50">
           <motion.h1
-            className="hero-title text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
+            className="hero-title text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-gradient-to-r from-lavender-100 via-lavender-200 to-lavender-300 bg-clip-text text-transparent"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -140,7 +146,7 @@ export function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="hero-subtitle text-lg md:text-xl mb-8 opacity-90"
+            className="hero-subtitle text-lg md:text-xl mb-8 text-lavender-200 font-light"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -160,7 +166,7 @@ export function HeroSection() {
             >
               <Button
                 size="lg"
-                className="bg-white text-black hover:bg-white/90 shadow-lg"
+                className="bg-lavender-gradient text-dark-purple-800 hover:shadow-lavender font-semibold tracking-wide"
                 asChild
               >
                 <Link href="/shop">Shop Now</Link>
@@ -175,7 +181,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-white border-white hover:bg-white hover:text-black backdrop-blur-sm"
+                className="text-lavender-200 border-lavender-400 hover:bg-lavender-400 hover:text-dark-purple-800 backdrop-blur-sm glass-effect"
                 asChild
               >
                 <Link href="/collections/bestsellers">Best Sellers</Link>

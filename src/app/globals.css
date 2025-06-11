@@ -44,72 +44,71 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.13 0.028 261.692);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.13 0.028 261.692);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.13 0.028 261.692);
-  --primary: oklch(0.21 0.034 264.665);
-  --primary-foreground: oklch(0.985 0.002 247.839);
-  --secondary: oklch(0.967 0.003 264.542);
-  --secondary-foreground: oklch(0.21 0.034 264.665);
-  --muted: oklch(0.967 0.003 264.542);
-  --muted-foreground: oklch(0.551 0.027 264.364);
-  --accent: oklch(0.967 0.003 264.542);
-  --accent-foreground: oklch(0.21 0.034 264.665);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.928 0.006 264.531);
-  --input: oklch(0.928 0.006 264.531);
-  --ring: oklch(0.707 0.022 261.325);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0.002 247.839);
-  --sidebar-foreground: oklch(0.13 0.028 261.692);
-  --sidebar-primary: oklch(0.21 0.034 264.665);
-  --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
-  --sidebar-accent: oklch(0.967 0.003 264.542);
-  --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
-  --sidebar-border: oklch(0.928 0.006 264.531);
-  --sidebar-ring: oklch(0.707 0.022 261.325);
+  --radius: 0.75rem;
+  /* Elegant Dark Background with Pastel Lavender Accents */
+  --background: #0f0f1a; /* Deep dark navy-purple background */
+  --foreground: #f8f8ff; /* Soft white with subtle lavender tint */
+  --card: #1a1a2e; /* Dark card background with purple undertones */
+  --card-foreground: #f0f0ff; /* Light lavender text */
+  --popover: #1e1e3a; /* Darker popover background */
+  --popover-foreground: #f0f0ff; /* Light lavender text */
+  --primary: #c8a2ff; /* Soft pastel lavender primary */
+  --primary-foreground: #1a1a2e; /* Dark text on primary */
+  --secondary: #2e2e4a; /* Muted dark purple secondary */
+  --secondary-foreground: #e6d9ff; /* Light lavender text */
+  --muted: #292940; /* Subtle background muted */
+  --muted-foreground: #b5a3d6; /* Muted lavender text */
+  --accent: #d4b3ff; /* Lighter pastel lavender accent */
+  --accent-foreground: #1a1a2e; /* Dark text on accent */
+  --destructive: #ff8a8a; /* Soft pastel red for errors */
+  --destructive-foreground: #1a1a2e; /* Dark text on destructive */
+  --border: #3d3d5c; /* Subtle purple-tinted borders */
+  --input: #252540; /* Input background */
+  --ring: #b89bff; /* Focus ring color */
+  --chart-1: #c8a2ff; /* Pastel lavender */
+  --chart-2: #a8d8ff; /* Pastel blue */
+  --chart-3: #d4b3ff; /* Light lavender */
+  --chart-4: #ffb3d9; /* Pastel pink */
+  --chart-5: #c3ffb3; /* Pastel mint */
+  --sidebar: #16162b; /* Darker sidebar */
+  --sidebar-foreground: #f0f0ff; /* Light sidebar text */
+  --sidebar-primary: #c8a2ff; /* Pastel lavender primary in sidebar */
+  --sidebar-primary-foreground: #1a1a2e; /* Dark text on primary */
+  --sidebar-accent: #2e2e4a; /* Sidebar accent background */
+  --sidebar-accent-foreground: #e6d9ff; /* Light accent text */
+  --sidebar-border: #3d3d5c; /* Sidebar borders */
+  --sidebar-ring: #b89bff; /* Sidebar focus ring */
 }
 
 .dark {
-  --background: oklch(0.13 0.028 261.692);
-  --foreground: oklch(0.985 0.002 247.839);
-  --card: oklch(0.21 0.034 264.665);
-  --card-foreground: oklch(0.985 0.002 247.839);
-  --popover: oklch(0.21 0.034 264.665);
-  --popover-foreground: oklch(0.985 0.002 247.839);
-  --primary: oklch(0.928 0.006 264.531);
-  --primary-foreground: oklch(0.21 0.034 264.665);
-  --secondary: oklch(0.278 0.033 256.848);
-  --secondary-foreground: oklch(0.985 0.002 247.839);
-  --muted: oklch(0.278 0.033 256.848);
-  --muted-foreground: oklch(0.707 0.022 261.325);
-  --accent: oklch(0.278 0.033 256.848);
-  --accent-foreground: oklch(0.985 0.002 247.839);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.034 264.665);
-  --sidebar-foreground: oklch(0.985 0.002 247.839);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
-  --sidebar-accent: oklch(0.278 0.033 256.848);
-  --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  /* Enhanced dark mode with deeper colors */
+  --background: #0a0a15; /* Even deeper background */
+  --foreground: #fafaff; /* Brighter foreground */
+  --card: #141426; /* Darker cards */
+  --card-foreground: #f5f5ff; /* Lighter card text */
+  --popover: #18182d; /* Darker popovers */
+  --popover-foreground: #f5f5ff; /* Lighter popover text */
+  --primary: #b899ff; /* Slightly deeper lavender */
+  --primary-foreground: #141426; /* Dark text on primary */
+  --secondary: #262640; /* Deeper secondary */
+  --secondary-foreground: #e0d0ff; /* Lighter secondary text */
+  --muted: #202038; /* Deeper muted background */
+  --muted-foreground: #a599c9; /* Muted lavender text */
+  --accent: #c9b3ff; /* Rich pastel lavender */
+  --accent-foreground: #141426; /* Dark text on accent */
+  --destructive: #ff7a7a; /* Vibrant but soft red */
+  --destructive-foreground: #141426; /* Dark text on destructive */
+  --border: #2d2d4a; /* Darker borders */
+  --input: #1f1f35; /* Darker input background */
+  --ring: #a68bff; /* Deeper focus ring */
+  --sidebar: #0f0f20; /* Darkest sidebar */
+  --sidebar-foreground: #f5f5ff; /* Bright sidebar text */
+  --sidebar-primary: #b899ff; /* Deeper lavender in sidebar */
+  --sidebar-primary-foreground: #141426; /* Dark text on primary */
+  --sidebar-accent: #262640; /* Deeper sidebar accent */
+  --sidebar-accent-foreground: #e0d0ff; /* Light accent text */
+  --sidebar-border: #2d2d4a; /* Darker sidebar borders */
+  --sidebar-ring: #a68bff; /* Deeper sidebar focus ring */
 }
 
 @layer base {
@@ -118,6 +117,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Add subtle gradient overlay for extra elegance */
+    background-image: radial-gradient(
+      ellipse at top,
+      rgba(200, 162, 255, 0.05) 0%,
+      transparent 70%
+    );
+    background-attachment: fixed;
   }
 }
 
@@ -144,6 +150,31 @@
   /* Smooth scrolling for parallax effects */
   .smooth-scroll {
     scroll-behavior: smooth;
+  }
+
+  /* Custom lavender gradient backgrounds */
+  .bg-lavender-gradient {
+    background: linear-gradient(135deg, #c8a2ff 0%, #d4b3ff 50%, #e6d9ff 100%);
+  }
+
+  .bg-dark-lavender-gradient {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2e2e4a 50%, #3d3d5c 100%);
+  }
+
+  /* Elegant glass effect */
+  .glass-effect {
+    background: rgba(26, 26, 46, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 162, 255, 0.2);
+  }
+
+  /* Subtle glow effects */
+  .glow-lavender {
+    box-shadow: 0 0 20px rgba(200, 162, 255, 0.3);
+  }
+
+  .glow-soft {
+    box-shadow: 0 4px 20px rgba(200, 162, 255, 0.1);
   }
 }
 
