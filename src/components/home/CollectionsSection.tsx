@@ -249,7 +249,7 @@ export function CollectionsSection() {
                         className="border-white text-white hover:bg-white hover:text-black backdrop-blur-sm transition-all duration-300"
                         asChild
                       >
-                        <Link href={collection.link}>Explore Collection</Link>
+                        <Link href={collection.link}>Explore </Link>
                       </Button>
                     </motion.div>
                   </CardContent>
