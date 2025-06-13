@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useAppSelector, useAppDispatch } from "@/lib/hooks/reduxHooks";
+
 import { logoutUser } from "@/lib/api/authApi";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/reduxHooks";
 
 const navigation = [
   { name: "Home", href: "/" },

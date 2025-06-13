@@ -1,29 +1,6 @@
-// Animation utilities for consistent motion design across the app
-import { Variants, Transition } from "framer-motion";
-
-// Common easing functions (Framer Motion compatible)
-export const easings = {
-  power1: [0.25, 0.46, 0.45, 0.94],
-  power2: [0.455, 0.03, 0.515, 0.955],
-  power3: [0.215, 0.61, 0.355, 1],
-  power4: [0.77, 0, 0.175, 1],
-  back: [0.68, -0.55, 0.265, 1.55],
-  elastic: [0.175, 0.885, 0.32, 1.275],
-  easeOut: "easeOut",
-  easeIn: "easeIn",
-  easeInOut: "easeInOut",
-  linear: "linear",
-} as const;
-
-// Common transition configurations
-export const transitions = {
-  fast: { duration: 0.3, ease: easings.power2 },
-  normal: { duration: 0.5, ease: easings.power3 },
-  slow: { duration: 0.8, ease: easings.power3 },
-  spring: { type: "spring", stiffness: 100, damping: 15 } as Transition,
-  bouncy: { type: "spring", stiffness: 400, damping: 17 } as Transition,
-  elastic: { type: "spring", stiffness: 200, damping: 20 } as Transition,
-} as const;
+// src/lib/animations/variants.ts
+import { Variants } from "framer-motion";
+import { transitions } from "./transitions";
 
 // Fade animations
 export const fadeVariants: Variants = {
@@ -218,78 +195,4 @@ export const gsapPresets = {
     from: { opacity: 0, y: 40 },
     to: { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.1 },
   },
-} as const;
-
-// Intersection Observer options
-export const observerOptions = {
-  threshold: 0.1,
-  triggerOnce: true,
-} as const;
-
-export const observerOptionsStrict = {
-  threshold: 0.3,
-  triggerOnce: true,
-} as const;
-
-// Animation utility functions
-export const createStaggerContainer = (
-  staggerChildren: number = 0.1,
-  delayChildren: number = 0.2
-): Variants => ({
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren,
-      delayChildren,
-    },
-  },
-});
-
-export const createSlideVariant = (
-  direction: "up" | "down" | "left" | "right",
-  distance: number = 50
-): Variants => {
-  switch (direction) {
-    case "up":
-      return {
-        hidden: { opacity: 0, y: distance },
-        visible: { opacity: 1, y: 0, transition: transitions.spring },
-      };
-    case "down":
-      return {
-        hidden: { opacity: 0, y: -distance },
-        visible: { opacity: 1, y: 0, transition: transitions.spring },
-      };
-    case "left":
-      return {
-        hidden: { opacity: 0, x: distance },
-        visible: { opacity: 1, x: 0, transition: transitions.spring },
-      };
-    case "right":
-      return {
-        hidden: { opacity: 0, x: -distance },
-        visible: { opacity: 1, x: 0, transition: transitions.spring },
-      };
-  }
-};
-
-export const createScaleVariant = (
-  initialScale: number = 0.8,
-  targetScale: number = 1
-): Variants => ({
-  hidden: { opacity: 0, scale: initialScale },
-  visible: {
-    opacity: 1,
-    scale: targetScale,
-    transition: transitions.elastic,
-  },
-});
-
-// Performance optimized motion components props
-export const motionProps = {
-  // Reduce layout calculations
-  layout: false,
-  // Enable hardware acceleration
-  style: { willChange: "transform, opacity" },
 } as const;

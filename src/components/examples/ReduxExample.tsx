@@ -8,7 +8,7 @@ import {
   removeFromCart,
   toggleCart,
   CartItem,
-} from "@/lib/slices/cartSlice";
+} from "@/redux/slices/cartSlice";
 import { addNotification, toggleSidebar } from "@/lib/slices/uiSlice";
 import {
   selectUser,

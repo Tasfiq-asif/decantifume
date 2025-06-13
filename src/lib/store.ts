@@ -3,7 +3,7 @@ import { combineReducers } from "@reduxjs/toolkit";
 
 // Import core slices (always loaded)
 import authSlice from "./slices/authSlice";
-import cartSlice from "./slices/cartSlice";
+import cartSlice from "../redux/slices/cartSlice";
 import uiSlice from "./slices/uiSlice";
 
 // Core reducers that are always loaded

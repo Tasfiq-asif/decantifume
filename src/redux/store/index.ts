@@ -1,13 +1,38 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { cartReducer } from '../slices/cartSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "@reduxjs/toolkit";
+
+// Import core slices (always loaded)
 
 
+import authSlice from "../slices/authSlice"
+import cartSlice from "../slices/cartSlice"
+
+// Core reducers that are always loaded
+const coreReducers = {
+  auth: authSlice,
+  cart: cartSlice,
+};
+
+// Create initial root reducer with core reducers
+const createRootReducer = (asyncReducers = {}) =>
+  combineReducers({
+    ...coreReducers,
+    ...asyncReducers,
+  });
+
+// Configure store
 export const store = configureStore({
-  reducer: {
-    cart: cartReducer,
-  },
-  devTools: process.env.NODE_ENV !== 'production',
+  reducer: createRootReducer(),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types for serialization checks
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
+  devTools: process.env.NODE_ENV !== "production",
 });
 
+// Export types
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch; 
+export type AppDispatch = typeof store.dispatch;

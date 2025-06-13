@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppDispatch } from '@/lib/hooks/reduxHooks';
-import { addToCart } from '@/lib/store/slices/cartSlice';
+import { addToCart } from '@/redux/slices/cartSlice';
 
 export interface Product {
   id: string;
