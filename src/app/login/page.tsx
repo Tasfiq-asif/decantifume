@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/reduxHooks";
 import { loginUser } from "@/lib/api/authApi";
-import { clearError } from "@/lib/slices/authSlice";
+import { clearError } from "@/redux/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
