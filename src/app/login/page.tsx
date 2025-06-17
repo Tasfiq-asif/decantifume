@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/reduxHooks";
-import { loginUser } from "@/lib/api/authApi";
-import { clearError } from "@/redux/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,10 +19,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading, error } = useAppSelector(
-    (state) => state.auth
-  );
+  const { data: session, status } = useSession();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,21 +27,15 @@ export default function LoginPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (status === "authenticated" && session) {
       router.push("/");
     }
-  }, [isAuthenticated, router]);
-
-  // Clear errors when component mounts or unmounts
-  useEffect(() => {
-    dispatch(clearError());
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+  }, [session, status, router]);
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
@@ -81,6 +70,11 @@ export default function LoginPage() {
         [name]: "",
       }));
     }
+
+    // Clear general error
+    if (error) {
+      setError("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,12 +84,28 @@ export default function LoginPage() {
       return;
     }
 
+    setIsLoading(true);
+    setError("");
+
     try {
-      await dispatch(loginUser(formData)).unwrap();
-      router.push("/");
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password");
+      } else {
+        // Login successful
+        router.push("/");
+        router.refresh();
+      }
     } catch (error) {
-      // Error is handled by Redux slice
+      setError("Login failed. Please try again.");
       console.error("Login failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

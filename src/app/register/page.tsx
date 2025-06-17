@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/reduxHooks";
-import { registerUser } from "@/lib/api/authApi";
-import { clearError } from "@/lib/slices/authSlice";
+import { authAPI, RegisterData } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,10 +20,7 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading, error } = useAppSelector(
-    (state) => state.auth
-  );
+  const { data: session, status } = useSession();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,28 +31,23 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (status === "authenticated" && session) {
       router.push("/");
     }
-  }, [isAuthenticated, router]);
-
-  // Clear errors when component mounts or unmounts
-  useEffect(() => {
-    dispatch(clearError());
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+  }, [session, status, router]);
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
-    if (!formData.name.trim()) {
+    if (!formData.name) {
       errors.name = "Name is required";
-    } else if (formData.name.trim().length < 2) {
+    } else if (formData.name.length < 2) {
       errors.name = "Name must be at least 2 characters";
     }
 
@@ -70,6 +61,9 @@ export default function RegisterPage() {
       errors.password = "Password is required";
     } else if (formData.password.length < 6) {
       errors.password = "Password must be at least 6 characters";
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      errors.password =
+        "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
     if (!formData.confirmPassword) {
@@ -96,6 +90,10 @@ export default function RegisterPage() {
         [name]: "",
       }));
     }
+
+    // Clear general error and success messages
+    if (error) setError("");
+    if (success) setSuccess("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,14 +103,40 @@ export default function RegisterPage() {
       return;
     }
 
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmPassword, ...registrationData } = formData;
-      await dispatch(registerUser(registrationData)).unwrap();
-      router.push("/");
-    } catch (error) {
-      // Error is handled by Redux slice
+      const registerData: RegisterData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      };
+
+      const response = await authAPI.register(registerData);
+
+      if (response.success) {
+        setSuccess(
+          "Registration successful! Please log in with your credentials."
+        );
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      }
+    } catch (error: any) {
+      setError(error.message || "Registration failed. Please try again.");
       console.error("Registration failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -129,15 +153,15 @@ export default function RegisterPage() {
               DECANT
             </h2>
             <p className="mt-2 text-sm text-lavender-200">
-              Create your account to start exploring our perfume collection.
+              Create your account to get started.
             </p>
           </div>
 
           <Card className="glass-effect border-lavender-400/20 shadow-lavender-soft backdrop-blur-xl">
             <CardHeader>
-              <CardTitle>Create Account</CardTitle>
+              <CardTitle>Sign Up</CardTitle>
               <CardDescription>
-                Fill in your details to create a new account
+                Enter your information to create an account
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -204,7 +228,7 @@ export default function RegisterPage() {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
+                      placeholder="Enter your password"
                       value={formData.password}
                       onChange={handleInputChange}
                       className={`pl-10 pr-10 ${
@@ -281,37 +305,29 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </Button>
+                {success && (
+                  <div className="p-3 rounded-md bg-green-500/10 border border-green-500/20">
+                    <p className="text-sm text-green-600">{success}</p>
+                  </div>
+                )}
 
-                <div className="text-center text-xs text-muted-foreground">
-                  By creating an account, you agree to our{" "}
-                  <Link
-                    href="/terms"
-                    className="underline hover:text-foreground"
-                  >
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    href="/privacy"
-                    className="underline hover:text-foreground"
-                  >
-                    Privacy Policy
-                  </Link>
-                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Creating account..." : "Create Account"}
+                </Button>
               </form>
 
               <Separator className="my-6" />
 
-              <div className="text-center space-y-2">
+              <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  Already have an account?
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Sign in
+                  </Link>
                 </p>
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="/login">Sign In</Link>
-                </Button>
               </div>
             </CardContent>
           </Card>
