@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { ReduxProvider } from "@/lib/providers/ReduxProvider";
-import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/lib/providers/AuthProvider";
 
 // Load Roboto font with variable to prevent hydration issues
 const roboto = Roboto({
