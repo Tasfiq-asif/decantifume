@@ -3,15 +3,13 @@ import { combineReducers } from "@reduxjs/toolkit";
 
 // Import core slices (always loaded)
 
-import authSlice from "../slices/authSlice";
 import cartSlice from "../slices/cartSlice";
 import userSlice from "../slices/userSlice";
 
 // Core reducers that are always loaded
 const coreReducers = {
-  auth: authSlice, // Keep for backward compatibility or remove later
   cart: cartSlice,
-  user: userSlice, // New: syncs with NextAuth
+  user: userSlice, // Handles all auth state with NextAuth sync
 };
 
 // Create initial root reducer with core reducers

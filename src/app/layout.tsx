@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
+import { LoadingProvider } from "@/lib/providers/LoadingProvider";
 
 // Load Roboto font with variable to prevent hydration issues
 const roboto = Roboto({
@@ -28,9 +29,9 @@ export default function RootLayout({
         className="font-sans antialiased bg-background text-foreground min-h-screen"
         suppressHydrationWarning={true}
       >
-        <SessionProvider>
-          <ReduxProvider>{children}</ReduxProvider>
-        </SessionProvider>
+        <AuthProvider>
+          <LoadingProvider>{children}</LoadingProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
-import { logoutUser } from "@/lib/api/authApi";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/reduxHooks";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useAppSelector } from "@/lib/hooks/reduxHooks";
+import { usePageLoading } from "@/lib/hooks/usePageLoading";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -25,12 +26,18 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const dispatch = useAppDispatch();
   const { totalQuantity } = useAppSelector((state) => state.cart);
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user, logout } = useAuth();
+  const { navigateWithLoading } = usePageLoading();
 
   const handleLogout = async () => {
-    await dispatch(logoutUser());
+    await logout();
+  };
+
+  const handleNavigation = (href: string, name: string) => {
+    if (pathname !== href) {
+      navigateWithLoading(href, `Loading ${name}...`);
+    }
   };
 
   return (
@@ -46,17 +53,17 @@ export function Navbar() {
           <SheetContent side="left" className="w-[240px] sm:w-[300px]">
             <nav className="flex flex-col gap-4 mt-8">
               {navigation.map((item) => (
-                <Link
+                <button
                   key={item.name}
-                  href={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                  onClick={() => handleNavigation(item.href, item.name)}
+                  className={`text-left text-sm font-medium transition-colors hover:text-primary ${
                     pathname === item.href
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
                   {item.name}
-                </Link>
+                </button>
               ))}
             </nav>
           </SheetContent>
@@ -68,9 +75,9 @@ export function Navbar() {
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             {navigation.map((item) => (
-              <Link
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => handleNavigation(item.href, item.name)}
                 className={`transition-colors hover:text-primary ${
                   pathname === item.href
                     ? "text-primary"
@@ -78,7 +85,7 @@ export function Navbar() {
                 }`}
               >
                 {item.name}
-              </Link>
+              </button>
             ))}
           </nav>
         </div>
@@ -109,20 +116,20 @@ export function Navbar() {
                   <DropdownMenuItem>
                     <span className="text-sm font-medium">{user?.name}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/account" className="w-full">
-                      My Account
-                    </Link>
+                  <DropdownMenuItem
+                    onClick={() => handleNavigation("/account", "Account")}
+                  >
+                    <span className="w-full">My Account</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/orders" className="w-full">
-                      Orders
-                    </Link>
+                  <DropdownMenuItem
+                    onClick={() => handleNavigation("/orders", "Orders")}
+                  >
+                    <span className="w-full">Orders</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/wishlist" className="w-full">
-                      Wishlist
-                    </Link>
+                  <DropdownMenuItem
+                    onClick={() => handleNavigation("/wishlist", "Wishlist")}
+                  >
+                    <span className="w-full">Wishlist</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <span className="w-full">Sign Out</span>

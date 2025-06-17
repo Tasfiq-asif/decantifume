@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Axios instance for auth API calls
 const authApi = axios.create({
@@ -81,6 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
       session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
       session.error = token.error as string;
 
       return session;

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Axios instance for API calls
 const api = axios.create({
@@ -11,28 +12,13 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Types
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface ChangePasswordData {
-  oldPassword: string;
-  newPassword: string;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
-}
+// Import centralized types
+import type {
+  RegisterData,
+  LoginCredentials,
+  ChangePasswordData,
+  ApiResponse,
+} from "@/types/auth";
 
 // API Functions
 export const authAPI = {
@@ -47,7 +33,7 @@ export const authAPI = {
   },
 
   // Login user (used internally by NextAuth)
-  login: async (credentials: LoginData): Promise<ApiResponse<any>> => {
+  login: async (credentials: LoginCredentials): Promise<ApiResponse<any>> => {
     try {
       const response = await api.post("/v1/auth/login", credentials);
       return response.data;
@@ -117,7 +103,7 @@ api.interceptors.response.use(
             return api(originalRequest);
           }
         }
-      } catch (refreshError) {
+      } catch {
         // Refresh failed, redirect to login
         window.location.href = "/login";
       }

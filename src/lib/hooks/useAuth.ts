@@ -7,11 +7,13 @@ import {
   setError,
 } from "@/redux/slices/userSlice";
 import { useEffect } from "react";
+import { useLoading } from "@/lib/providers/LoadingProvider";
 
 export const useAuth = () => {
   const { data: session, status } = useSession();
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user);
+  const { setLoading: setGlobalLoading } = useLoading();
 
   // Sync NextAuth session with Redux
   useEffect(() => {
@@ -41,6 +43,7 @@ export const useAuth = () => {
   const login = async (credentials: { email: string; password: string }) => {
     try {
       dispatch(setLoading(true));
+      setGlobalLoading(true, "Signing you in...");
       dispatch(setError(null));
 
       const result = await signIn("credentials", {
@@ -54,6 +57,8 @@ export const useAuth = () => {
         return { success: false, error: "Invalid credentials" };
       }
 
+      setGlobalLoading(true, "Welcome back!");
+      setTimeout(() => setGlobalLoading(false), 1000); // Brief success message
       return { success: true };
     } catch (error) {
       const errorMessage =
@@ -69,13 +74,16 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       dispatch(setLoading(true));
+      setGlobalLoading(true, "Signing you out...");
       await signOut({ redirect: false });
       dispatch(clearUser());
+      setGlobalLoading(false);
       return { success: true };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Logout failed";
       dispatch(setError(errorMessage));
+      setGlobalLoading(false);
       return { success: false, error: errorMessage };
     } finally {
       dispatch(setLoading(false));

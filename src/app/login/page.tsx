@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +19,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { isAuthenticated, isLoading, error, login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,15 +27,13 @@ export default function LoginPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (status === "authenticated" && session) {
+    if (isAuthenticated) {
       router.push("/");
     }
-  }, [session, status, router]);
+  }, [isAuthenticated, router]);
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
@@ -70,11 +68,6 @@ export default function LoginPage() {
         [name]: "",
       }));
     }
-
-    // Clear general error
-    if (error) {
-      setError("");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,28 +77,19 @@ export default function LoginPage() {
       return;
     }
 
-    setIsLoading(true);
-    setError("");
-
     try {
-      const result = await signIn("credentials", {
+      const result = await login({
         email: formData.email,
         password: formData.password,
-        redirect: false,
       });
 
-      if (result?.error) {
-        setError("Invalid email or password");
-      } else {
-        // Login successful
+      if (result.success) {
         router.push("/");
         router.refresh();
       }
-    } catch (error) {
-      setError("Login failed. Please try again.");
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
+      // Error handling is done by useAuth hook and displayed via the error state
+    } catch (err) {
+      console.error("Login failed:", err);
     }
   };
 
@@ -232,7 +216,7 @@ export default function LoginPage() {
 
               <div className="mt-4 p-3 bg-muted/50 rounded-md">
                 <p className="text-xs text-muted-foreground text-center">
-                  Demo credentials: test@example.com / password
+                  Demo credentials: test@example.com / Password123
                 </p>
               </div>
             </CardContent>

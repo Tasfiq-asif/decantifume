@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { authAPI, RegisterData } from "@/lib/api/auth";
+import { authAPI } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { RegisterData } from "@/types/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -132,6 +133,7 @@ export default function RegisterPage() {
           router.push("/login");
         }, 2000);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setError(error.message || "Registration failed. Please try again.");
       console.error("Registration failed:", error);
