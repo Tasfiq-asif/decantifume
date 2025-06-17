@@ -117,17 +117,32 @@ export function Navbar() {
                     <span className="text-sm font-medium">{user?.name}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => handleNavigation("/account", "Account")}
+                    onClick={() =>
+                      handleNavigation(
+                        user?.role === "admin"
+                          ? "/dashboard/admin"
+                          : "/dashboard/user",
+                        "Dashboard"
+                      )
+                    }
                   >
-                    <span className="w-full">My Account</span>
+                    <span className="w-full">
+                      {user?.role === "admin"
+                        ? "Admin Dashboard"
+                        : "My Dashboard"}
+                    </span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => handleNavigation("/orders", "Orders")}
+                    onClick={() =>
+                      handleNavigation("/dashboard/user/orders", "Orders")
+                    }
                   >
-                    <span className="w-full">Orders</span>
+                    <span className="w-full">My Orders</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => handleNavigation("/wishlist", "Wishlist")}
+                    onClick={() =>
+                      handleNavigation("/dashboard/user/wishlist", "Wishlist")
+                    }
                   >
                     <span className="w-full">Wishlist</span>
                   </DropdownMenuItem>
