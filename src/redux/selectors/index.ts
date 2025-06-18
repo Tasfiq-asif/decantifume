@@ -7,13 +7,12 @@ export const selectUserLoading = (state: RootState) => state.user.isLoading;
 export const selectIsAuthenticated = (state: RootState) =>
   state.user.isAuthenticated;
 
-// Auth selectors
-export const selectAuth = (state: RootState) => state.auth;
-export const selectUser = (state: RootState) => state.auth.user;
-
-// Existing selectors
+// Cart selectors
 export const selectCartItems = (state: RootState) => state.cart.items;
 export const selectCartTotal = (state: RootState) => state.cart.totalAmount;
+export const selectCartTotalQuantity = (state: RootState) =>
+  state.cart.totalQuantity;
+export const selectCartIsOpen = (state: RootState) => state.cart.isOpen;
 
 // Product selectors
 export const selectProducts = (state: RootState) => state.products.products;
