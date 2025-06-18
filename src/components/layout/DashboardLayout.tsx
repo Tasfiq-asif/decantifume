@@ -18,7 +18,6 @@ import {
   CreditCard,
   LogOut,
   Home,
-  Shield,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -30,7 +29,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isAdmin = user?.role === "admin";
   const isAdminRoute = pathname.startsWith("/dashboard/admin");
 
   // Admin navigation items
@@ -121,38 +119,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {isAdminRoute ? "Admin Panel" : "My Account"}
               </p>
             </Link>
-
-            {/* Role Switcher (for admins) */}
-            {isAdmin && (
-              <div className="mb-6">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => router.push("/dashboard/admin")}
-                    size="sm"
-                    className={`flex-1 ${
-                      isAdminRoute
-                        ? "bg-lavender-600 text-white"
-                        : "bg-white/10 text-lavender-300 hover:text-white"
-                    }`}
-                  >
-                    <Shield className="h-4 w-4 mr-1" />
-                    Admin
-                  </Button>
-                  <Button
-                    onClick={() => router.push("/dashboard/user")}
-                    size="sm"
-                    className={`flex-1 ${
-                      !isAdminRoute
-                        ? "bg-lavender-600 text-white"
-                        : "bg-white/10 text-lavender-300 hover:text-white"
-                    }`}
-                  >
-                    <User className="h-4 w-4 mr-1" />
-                    User
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {/* Navigation */}
             <nav className="space-y-2">

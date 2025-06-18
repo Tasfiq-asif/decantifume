@@ -29,7 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
-          const response = await authApi.post("/v1/auth/login", {
+          const response = await authApi.post("/auth/login", {
             email: credentials.email,
             password: credentials.password,
           });

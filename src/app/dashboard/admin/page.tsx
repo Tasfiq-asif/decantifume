@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
   Users,
   Package,
@@ -149,188 +148,182 @@ export default function AdminDashboard() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-lavender-200">
-            Welcome back, {user?.name}! Here&apos;s what&apos;s happening with
-            your store.
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">
-                Total Users
-              </CardTitle>
-              <Users className="h-4 w-4 text-lavender-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {stats.totalUsers.toLocaleString()}
-              </div>
-              <p className="text-xs text-lavender-300">+12% from last month</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">
-                Total Products
-              </CardTitle>
-              <Package className="h-4 w-4 text-lavender-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {stats.totalProducts}
-              </div>
-              <p className="text-xs text-lavender-300">+3 new this week</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">
-                Total Orders
-              </CardTitle>
-              <ShoppingCart className="h-4 w-4 text-lavender-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {stats.totalOrders}
-              </div>
-              <p className="text-xs text-lavender-300">+23 from yesterday</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">
-                Total Revenue
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-lavender-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                ${stats.totalRevenue.toLocaleString()}
-              </div>
-              <p className="text-xs text-lavender-300 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />+{stats.monthlyGrowth}%
-                from last month
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-          <Button
-            onClick={() => router.push("/dashboard/admin/products/new")}
-            className="bg-lavender-600 hover:bg-lavender-700 text-white h-12"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Button>
-          <Button
-            onClick={() => router.push("/dashboard/admin/users")}
-            className="bg-dark-purple-600 hover:bg-dark-purple-700 text-white h-12"
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Manage Users
-          </Button>
-          <Button
-            onClick={() => router.push("/dashboard/admin/orders")}
-            className="bg-gold hover:bg-gold/90 text-dark-purple-900 h-12"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            View Orders
-          </Button>
-          <Button
-            onClick={() => router.push("/dashboard/admin/analytics")}
-            className="bg-white/20 hover:bg-white/30 text-white h-12 backdrop-blur-sm"
-          >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
-          </Button>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Orders */}
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Recent Orders
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {stats.recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                  >
-                    <div>
-                      <p className="text-white font-medium">
-                        {order.customerName}
-                      </p>
-                      <p className="text-lavender-300 text-sm">
-                        {order.id} • {order.date}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white font-medium">${order.amount}</p>
-                      <Badge className={getStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Top Products */}
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Package className="h-5 w-5 mr-2" />
-                Top Products
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {stats.topProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                  >
-                    <div>
-                      <p className="text-white font-medium">{product.name}</p>
-                      <p className="text-lavender-300 text-sm">
-                        {product.sales} sales
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white font-medium">
-                        ${product.revenue}
-                      </p>
-                      <p className="text-lavender-300 text-sm">Revenue</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="container mx-auto px-6 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
+        <p className="text-lavender-200">
+          Welcome back, {user?.name}! Here&apos;s what&apos;s happening with
+          your store.
+        </p>
       </div>
-    </DashboardLayout>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              Total Users
+            </CardTitle>
+            <Users className="h-4 w-4 text-lavender-300" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {stats.totalUsers.toLocaleString()}
+            </div>
+            <p className="text-xs text-lavender-300">+12% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              Total Products
+            </CardTitle>
+            <Package className="h-4 w-4 text-lavender-300" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {stats.totalProducts}
+            </div>
+            <p className="text-xs text-lavender-300">+3 new this week</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              Total Orders
+            </CardTitle>
+            <ShoppingCart className="h-4 w-4 text-lavender-300" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {stats.totalOrders}
+            </div>
+            <p className="text-xs text-lavender-300">+23 from yesterday</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              Total Revenue
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-lavender-300" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              ${stats.totalRevenue.toLocaleString()}
+            </div>
+            <p className="text-xs text-lavender-300 flex items-center">
+              <TrendingUp className="h-3 w-3 mr-1" />+{stats.monthlyGrowth}%
+              from last month
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+        <Button
+          onClick={() => router.push("/dashboard/admin/products/new")}
+          className="bg-lavender-600 hover:bg-lavender-700 text-white h-12"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Product
+        </Button>
+        <Button
+          onClick={() => router.push("/dashboard/admin/users")}
+          className="bg-dark-purple-600 hover:bg-dark-purple-700 text-white h-12"
+        >
+          <Users className="h-4 w-4 mr-2" />
+          Manage Users
+        </Button>
+        <Button
+          onClick={() => router.push("/dashboard/admin/orders")}
+          className="bg-gold hover:bg-gold/90 text-dark-purple-900 h-12"
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View Orders
+        </Button>
+        <Button
+          onClick={() => router.push("/dashboard/admin/analytics")}
+          className="bg-white/20 hover:bg-white/30 text-white h-12 backdrop-blur-sm"
+        >
+          <BarChart3 className="h-4 w-4 mr-2" />
+          Analytics
+        </Button>
+      </div>
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Orders */}
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Recent Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                >
+                  <div>
+                    <p className="text-white font-medium">
+                      {order.customerName}
+                    </p>
+                    <p className="text-lavender-300 text-sm">
+                      {order.id} • {order.date}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white font-medium">${order.amount}</p>
+                    <Badge className={getStatusColor(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Products */}
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <Package className="h-5 w-5 mr-2" />
+              Top Products
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.topProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                >
+                  <div>
+                    <p className="text-white font-medium">{product.name}</p>
+                    <p className="text-lavender-300 text-sm">
+                      {product.sales} sales
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white font-medium">${product.revenue}</p>
+                    <p className="text-lavender-300 text-sm">Revenue</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

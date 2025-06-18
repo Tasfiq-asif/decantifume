@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SiteLayout } from "@/components/layout/SiteLayout";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Shield, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -91,6 +91,25 @@ export default function LoginPage() {
     } catch (err) {
       console.error("Login failed:", err);
     }
+  };
+
+  // Demo credential functions
+  const fillAdminCredentials = () => {
+    setFormData({
+      email: "admin@decant.com",
+      password: "Password123",
+    });
+    // Clear any existing errors
+    setFormErrors({});
+  };
+
+  const fillUserCredentials = () => {
+    setFormData({
+      email: "test@example.com",
+      password: "Password123",
+    });
+    // Clear any existing errors
+    setFormErrors({});
   };
 
   return (
@@ -214,9 +233,37 @@ export default function LoginPage() {
                 </Button>
               </div>
 
-              <div className="mt-4 p-3 bg-muted/50 rounded-md">
+              <Separator className="my-4" />
+
+              {/* Demo Credentials Section */}
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground text-center font-medium">
+                  Quick Demo Login:
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={fillAdminCredentials}
+                    disabled={isLoading}
+                    className="flex-1 bg-gradient-to-r from-red-500/10 to-red-600/10 border-red-500/20 hover:bg-red-500/20 transition-colors"
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin Login
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={fillUserCredentials}
+                    disabled={isLoading}
+                    className="flex-1 bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    User Login
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground text-center">
-                  Demo credentials: test@example.com / Password123
+                  Click to auto-fill credentials for testing
                 </p>
               </div>
             </CardContent>
