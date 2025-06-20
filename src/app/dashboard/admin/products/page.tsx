@@ -17,6 +17,23 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+// Redux imports
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import {
+  fetchProducts,
+  setFilters,
+  clearFilters,
+  clearError,
+} from "@/redux/slices/productSlice";
+import {
+  selectProducts,
+  selectProductsLoading,
+  selectProductsError,
+  selectProductFilters,
+  selectProductPagination,
+} from "@/redux/selectors";
+
 import { Button } from "@/components/ui/button";
 import { HeroButton } from "@/components/ui/hero-button";
 import { Input } from "@/components/ui/input";
@@ -601,15 +618,24 @@ export default function AdminProductsPage() {
   const router = useRouter();
   const { withLoading } = usePageLoading();
 
-  // States
-  const [products, setProducts] = useState<Product[]>([]);
+  // Redux hooks
+  const dispatch = useDispatch<AppDispatch>();
+  const products = useSelector(selectProducts);
+  const loading = useSelector(selectProductsLoading);
+  const error = useSelector(selectProductsError);
+  const filters = useSelector(selectProductFilters);
+  const pagination = useSelector(selectProductPagination);
+
+  // Local states (form and UI specific)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
   const [newTag, setNewTag] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Local search and filter states
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
+  const [localCategoryFilter, setLocalCategoryFilter] = useState("");
 
   // Authentication check
   useEffect(() => {
@@ -627,24 +653,52 @@ export default function AdminProductsPage() {
     }
   }, [status, session?.user?.role, router]);
 
-  // Fetch products
-  const fetchProducts = useCallback(async () => {
-    try {
-      const response = await api.get("/products");
-      setProducts(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      toast.error("Failed to fetch products");
-    }
-  }, []);
-
+  // Load products using Redux when authenticated
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role === "admin") {
-      fetchProducts();
-      // Test toast to verify Sonner is working
+      // Initial load with admin-specific filters
+      dispatch(
+        fetchProducts({
+          limit: 50, // Load more products for admin
+          sortBy: "updatedAt",
+          sortOrder: "desc",
+        })
+      );
+
       toast.success("Admin products page loaded!");
     }
-  }, [status, session?.user?.role, fetchProducts]);
+  }, [status, session?.user?.role, dispatch]);
+
+  // Handle Redux errors
+  useEffect(() => {
+    if (error) {
+      toast.error(`Error loading products: ${error}`);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
+  // Apply filters with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const newFilters = {
+        searchTerm: localSearchTerm || undefined,
+        category: localCategoryFilter || undefined,
+        limit: 50,
+        sortBy: "updatedAt",
+        sortOrder: "desc" as const,
+      };
+
+      dispatch(setFilters(newFilters));
+      dispatch(fetchProducts(newFilters));
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [localSearchTerm, localCategoryFilter, dispatch]);
+
+  // Refresh products function
+  const refreshProducts = useCallback(() => {
+    dispatch(fetchProducts(filters));
+  }, [dispatch, filters]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -665,10 +719,8 @@ export default function AdminProductsPage() {
         try {
           const productData = {
             ...formData,
-            thumbnail: formData.images[0], // First image as thumbnail
+            thumbnail: formData.images[0],
           };
-
-          console.log("Sending form data:", productData);
 
           if (editingProduct) {
             await api.patch(`/products/${editingProduct._id}`, productData);
@@ -681,7 +733,9 @@ export default function AdminProductsPage() {
           setIsDialogOpen(false);
           setEditingProduct(null);
           setFormData(initialFormData);
-          fetchProducts();
+
+          // Refresh products after create/update
+          refreshProducts();
         } catch (error: unknown) {
           const apiError = error as ApiError;
           console.error("Error saving product:", apiError);
@@ -787,7 +841,7 @@ export default function AdminProductsPage() {
       try {
         await api.delete(`/products/${productId}`);
         toast.success("Product deleted successfully!");
-        await fetchProducts();
+        refreshProducts();
       } catch (error: unknown) {
         const apiError = error as ApiError;
         console.error("Error deleting product:", apiError);
@@ -839,17 +893,7 @@ export default function AdminProductsPage() {
     }));
   };
 
-  // Filter products
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      !categoryFilter || product.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Calculate statistics
+  // Calculate statistics from Redux state
   const stats = {
     total: products.length,
     active: products.filter((p) => p.status === "active").length,
@@ -895,15 +939,31 @@ export default function AdminProductsPage() {
             Manage your decant products, sizes, and pricing
           </p>
         </div>
-        <HeroButton
-          onClick={handleAddProduct}
-          variant="primary"
-          size="md"
-          className="flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Product
-        </HeroButton>
+        <div className="flex gap-3">
+          <HeroButton
+            onClick={refreshProducts}
+            variant="secondary"
+            size="md"
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            {loading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+            ) : (
+              <Search className="w-4 h-4" />
+            )}
+            Refresh
+          </HeroButton>
+          <HeroButton
+            onClick={handleAddProduct}
+            variant="primary"
+            size="md"
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Product
+          </HeroButton>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -916,7 +976,12 @@ export default function AdminProductsPage() {
             <Package className="w-4 h-4 text-lavender-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.total}</div>
+            <div className="text-2xl font-bold text-white">
+              {loading ? "..." : stats.total}
+            </div>
+            <p className="text-xs text-lavender-300 mt-1">
+              {pagination.total} total in database
+            </p>
           </CardContent>
         </Card>
         <Card className="bg-black/20 backdrop-blur-sm border border-white/10">
@@ -928,7 +993,7 @@ export default function AdminProductsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-400">
-              {stats.active}
+              {loading ? "..." : stats.active}
             </div>
           </CardContent>
         </Card>
@@ -941,7 +1006,7 @@ export default function AdminProductsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-400">
-              {stats.lowStock}
+              {loading ? "..." : stats.lowStock}
             </div>
           </CardContent>
         </Card>
@@ -954,7 +1019,7 @@ export default function AdminProductsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-lavender-400">
-              ${stats.totalValue.toFixed(2)}
+              {loading ? "..." : `$${stats.totalValue.toFixed(2)}`}
             </div>
           </CardContent>
         </Card>
@@ -969,16 +1034,16 @@ export default function AdminProductsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lavender-400 w-4 h-4" />
                 <Input
                   placeholder="Search products by name or brand..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={localSearchTerm}
+                  onChange={(e) => setLocalSearchTerm(e.target.value)}
                   className="pl-10 bg-black/20 border-white/10 text-white placeholder:text-lavender-300"
                 />
               </div>
             </div>
             <div className="w-full md:w-48">
               <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
+                value={localCategoryFilter}
+                onChange={(e) => setLocalCategoryFilter(e.target.value)}
                 className="w-full p-2 border border-white/10 rounded-lg bg-black/20 text-white focus:ring-2 focus:ring-lavender-500 focus:border-lavender-500"
               >
                 <option value="">All Categories</option>
@@ -990,189 +1055,212 @@ export default function AdminProductsPage() {
               </select>
             </div>
           </div>
+          {filters.searchTerm && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="text-sm text-lavender-300">Active filters:</span>
+              <Badge
+                variant="secondary"
+                className="bg-lavender-600/20 text-lavender-300"
+              >
+                Search: {filters.searchTerm}
+                <X
+                  className="w-3 h-3 ml-1 cursor-pointer"
+                  onClick={() => {
+                    setLocalSearchTerm("");
+                    dispatch(setFilters({ searchTerm: undefined }));
+                  }}
+                />
+              </Badge>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Products Table */}
       <Card className="bg-black/20 backdrop-blur-sm border border-white/10">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-black/30 border-white/10">
-                  <TableHead className="font-semibold text-white">
-                    Product
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Brand
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Category
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Sizes & Prices
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Total Stock
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Status
-                  </TableHead>
-                  <TableHead className="font-semibold text-white">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {filteredProducts.map((product) => (
-                    <motion.tr
-                      key={product._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="border-b border-white/10 hover:bg-white/5"
-                    >
-                      <TableCell className="py-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-12 w-12 border border-white/10">
-                            <AvatarImage
-                              src={product.thumbnail || product.images[0]}
-                            />
-                            <AvatarFallback className="bg-black/20 text-lavender-300">
-                              {product.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium text-white">
-                              {product.name}
-                            </div>
-                            <div className="text-sm text-lavender-300">
-                              {product.description.slice(0, 50)}...
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium text-white">
-                        {product.brand}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="bg-lavender-500/20 text-lavender-300 border-lavender-400/20"
-                        >
-                          {CATEGORIES.find((c) => c.value === product.category)
-                            ?.label || product.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          {product.decantSizes
-                            .slice(0, 3)
-                            .map((size, index) => (
-                              <div
-                                key={index}
-                                className="text-sm flex items-center gap-2"
-                              >
-                                <span className="font-medium text-white">
-                                  {size.size}
-                                </span>
-                                <span className="text-lavender-300">-</span>
-                                <span className="text-green-400 font-semibold">
-                                  ${size.price}
-                                </span>
-                              </div>
-                            ))}
-                          {product.decantSizes.length > 3 && (
-                            <div className="text-xs text-lavender-400">
-                              +{product.decantSizes.length - 3} more
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            product.totalStock < 10 ? "destructive" : "default"
-                          }
-                          className={
-                            product.totalStock < 10
-                              ? "bg-red-100 text-red-800 border-red-200"
-                              : "bg-green-100 text-green-800 border-green-200"
-                          }
-                        >
-                          {product.totalStock}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            product.status === "active"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className={
-                            product.status === "active"
-                              ? "bg-green-100 text-green-800 border-green-200"
-                              : "bg-gray-100 text-gray-600 border-gray-200"
-                          }
-                        >
-                          {product.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditProduct(product)}
-                            className="hover:bg-blue-50 hover:border-blue-200"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleDeleteProduct(product);
-                            }}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-500/20 border-red-400/20 hover:border-red-300"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
-          </div>
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-lavender-600 mr-2"></div>
+              <span className="text-lavender-300">Loading products...</span>
+            </div>
+          )}
 
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
+          {!loading && products.length === 0 && (
+            <div className="text-center py-8">
+              <Package className="w-12 h-12 text-lavender-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">
                 No products found
               </h3>
-              <p className="text-gray-500 mb-4">
-                {searchTerm || categoryFilter
-                  ? "Try adjusting your search or filter criteria"
+              <p className="text-lavender-300 mb-4">
+                {filters.searchTerm || filters.category
+                  ? "Try adjusting your search or filters"
                   : "Get started by adding your first product"}
               </p>
-              {!searchTerm && !categoryFilter && (
-                <HeroButton
-                  onClick={handleAddProduct}
-                  variant="primary"
-                  size="md"
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Your First Product
-                </HeroButton>
-              )}
+              <HeroButton onClick={handleAddProduct} variant="primary">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Product
+              </HeroButton>
+            </div>
+          )}
+
+          {!loading && products.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-black/30 border-white/10">
+                    <TableHead className="font-semibold text-white">
+                      Product
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Brand
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Category
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Sizes & Prices
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Total Stock
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Status
+                    </TableHead>
+                    <TableHead className="font-semibold text-white">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <AnimatePresence>
+                    {products.map((product) => (
+                      <motion.tr
+                        key={product._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="border-b border-white/10 hover:bg-white/5"
+                      >
+                        <TableCell className="py-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-12 w-12 border border-white/10">
+                              <AvatarImage
+                                src={product.thumbnail || product.images[0]}
+                              />
+                              <AvatarFallback className="bg-black/20 text-lavender-300">
+                                {product.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium text-white">
+                                {product.name}
+                              </div>
+                              <div className="text-sm text-lavender-300">
+                                {product.description.slice(0, 50)}...
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium text-white">
+                          {product.brand}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="bg-lavender-500/20 text-lavender-300 border-lavender-400/20"
+                          >
+                            {CATEGORIES.find(
+                              (c) => c.value === product.category
+                            )?.label || product.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            {product.decantSizes
+                              .slice(0, 3)
+                              .map((size, index) => (
+                                <div
+                                  key={index}
+                                  className="text-sm flex items-center gap-2"
+                                >
+                                  <span className="font-medium text-white">
+                                    {size.size}
+                                  </span>
+                                  <span className="text-lavender-300">-</span>
+                                  <span className="text-green-400 font-semibold">
+                                    ${size.price}
+                                  </span>
+                                </div>
+                              ))}
+                            {product.decantSizes.length > 3 && (
+                              <div className="text-xs text-lavender-400">
+                                +{product.decantSizes.length - 3} more
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              product.totalStock < 10
+                                ? "destructive"
+                                : "default"
+                            }
+                            className={
+                              product.totalStock < 10
+                                ? "bg-red-100 text-red-800 border-red-200"
+                                : "bg-green-100 text-green-800 border-green-200"
+                            }
+                          >
+                            {product.totalStock}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              product.status === "active"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              product.status === "active"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : "bg-gray-100 text-gray-600 border-gray-200"
+                            }
+                          >
+                            {product.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditProduct(product)}
+                              className="hover:bg-blue-50 hover:border-blue-200"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDeleteProduct(product);
+                              }}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/20 border-red-400/20 hover:border-red-300"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>
