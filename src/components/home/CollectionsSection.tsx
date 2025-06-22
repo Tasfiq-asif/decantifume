@@ -186,7 +186,7 @@ export function CollectionsSection() {
                   damping: 20,
                 },
               }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.99 }}
             >
               <Card className="overflow-hidden border-none shadow-lg hover:shadow-2xl transition-shadow duration-500">
                 <motion.div
