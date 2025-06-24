@@ -101,7 +101,7 @@ export const fetchProducts = createAsyncThunk(
         }
       });
 
-      const response = await api.get(`/v1/products?${params.toString()}`);
+      const response = await api.get(`/products?${params.toString()}`);
       return {
         products: response.data.data,
         pagination: response.data.meta,
@@ -119,7 +119,7 @@ export const fetchFeaturedProducts = createAsyncThunk(
   "products/fetchFeaturedProducts",
   async (limit: number = 8, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/v1/products/featured?limit=${limit}`);
+      const response = await api.get(`/products/featured?limit=${limit}`);
       return response.data.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -134,7 +134,7 @@ export const fetchProductById = createAsyncThunk(
   "products/fetchProductById",
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/v1/products/${id}`);
+      const response = await api.get(`/products/${id}`);
       return response.data.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -149,7 +149,7 @@ export const fetchProductBySlug = createAsyncThunk(
   "products/fetchProductBySlug",
   async (slug: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/v1/products/slug/${slug}`);
+      const response = await api.get(`/products/slug/${slug}`);
       return response.data.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -172,7 +172,7 @@ export const fetchRelatedProducts = createAsyncThunk(
   ) => {
     try {
       const response = await api.get(
-        `/v1/products/${id}/related?category=${category}&limit=${limit}`
+        `/products/${id}/related?category=${category}&limit=${limit}`
       );
       return response.data.data;
     } catch (error) {
@@ -192,7 +192,7 @@ export const fetchProductsByBrand = createAsyncThunk(
   ) => {
     try {
       const response = await api.get(
-        `/v1/products/brand/${brand}?limit=${limit}`
+        `/products/brand/${brand}?limit=${limit}`
       );
       return response.data.data;
     } catch (error) {
