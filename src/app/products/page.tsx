@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Filter, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { usePageLoading } from "@/lib/hooks/usePageLoading";
 
 // Transform Redux product to ProductCard format
@@ -34,7 +34,6 @@ export default function ProductsPage() {
     products,
     loading,
     error,
-    filters,
     pagination,
     availableCategories,
     availableBrands,
@@ -51,7 +50,6 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
 
   useEffect(() => {
     setLoading(true, "Loading products...");
@@ -88,22 +86,18 @@ export default function ProductsPage() {
     }
   };
 
-  const handleSort = (sortValue: string) => {
-    setSortBy(sortValue);
-    const [field, order] = sortValue.split("-");
-    sortProducts(field, order as "asc" | "desc");
+  const handleSort = (field: string, order: "asc" | "desc") => {
+    sortProducts(field, order);
   };
 
   const clearAllFilters = () => {
     setSearchTerm("");
     setSelectedCategory("");
     setSelectedBrand("");
-    setSortBy("createdAt");
     resetFilters();
   };
 
-  const hasActiveFilters =
-    searchTerm || selectedCategory || selectedBrand || sortBy !== "createdAt";
+  const hasActiveFilters = searchTerm || selectedCategory || selectedBrand;
 
   if (error) {
     return (
@@ -127,89 +121,121 @@ export default function ProductsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Our Collection</h1>
         <p className="text-muted-foreground">
-          Discover premium fragrances from the world's finest perfume houses
+          Discover premium fragrances from the world&apos;s finest perfume
+          houses
         </p>
       </div>
 
-      {/* Filters */}
+      {/* Search and Basic Filters */}
       <Card className="mb-8">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search perfumes, brands..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="pl-10"
-                />
-              </div>
+          {/* Search */}
+          <div className="flex gap-2 mb-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search perfumes, brands..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="pl-10"
+              />
             </div>
-
-            {/* Category Filter */}
-            <Select
-              value={selectedCategory}
-              onValueChange={handleCategoryFilter}
-            >
-              <SelectTrigger className="w-full lg:w-48">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {availableCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Brand Filter */}
-            <Select value={selectedBrand} onValueChange={handleBrandFilter}>
-              <SelectTrigger className="w-full lg:w-48">
-                <SelectValue placeholder="All Brands" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Brands</SelectItem>
-                {availableBrands.map((brand) => (
-                  <SelectItem key={brand} value={brand}>
-                    {brand}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Sort */}
-            <Select value={sortBy} onValueChange={handleSort}>
-              <SelectTrigger className="w-full lg:w-48">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt-desc">Newest First</SelectItem>
-                <SelectItem value="createdAt-asc">Oldest First</SelectItem>
-                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-                <SelectItem value="price-desc">Price (High to Low)</SelectItem>
-                <SelectItem value="averageRating-desc">
-                  Highest Rated
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Search Button */}
-            <Button onClick={handleSearch} className="lg:w-auto">
+            <Button onClick={handleSearch}>
               <Search className="h-4 w-4 mr-2" />
               Search
             </Button>
           </div>
 
+          {/* Sort Options */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="text-sm text-muted-foreground flex items-center">
+              Sort by:
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSort("createdAt", "desc")}
+            >
+              Newest
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSort("name", "asc")}
+            >
+              Name A-Z
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSort("averageRating", "desc")}
+            >
+              Rating
+            </Button>
+          </div>
+
+          {/* Categories */}
+          {availableCategories.length > 0 && (
+            <div className="mb-4">
+              <span className="text-sm text-muted-foreground block mb-2">
+                Categories:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedCategory === "" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleCategoryFilter("all")}
+                >
+                  All
+                </Button>
+                {availableCategories.slice(0, 6).map((category) => (
+                  <Button
+                    key={category}
+                    variant={
+                      selectedCategory === category ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleCategoryFilter(category)}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Brands */}
+          {availableBrands.length > 0 && (
+            <div className="mb-4">
+              <span className="text-sm text-muted-foreground block mb-2">
+                Popular Brands:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedBrand === "" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleBrandFilter("all")}
+                >
+                  All
+                </Button>
+                {availableBrands.slice(0, 8).map((brand) => (
+                  <Button
+                    key={brand}
+                    variant={selectedBrand === brand ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleBrandFilter(brand)}
+                  >
+                    {brand}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Active Filters */}
           {hasActiveFilters && (
-            <div className="flex flex-wrap items-center gap-2 mt-4">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">
                 Active filters:
               </span>

@@ -19,6 +19,7 @@ import { usePageLoading } from "@/lib/hooks/usePageLoading";
 
 const navigation = [
   { name: "Home", href: "/" },
+  { name: "Products", href: "/products" },
   { name: "Collections", href: "/collections" },
   { name: "About Us", href: "/about" },
   { name: "Contact", href: "/contact" },
