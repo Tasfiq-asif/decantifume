@@ -104,7 +104,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 // Function to refresh access token
 async function refreshAccessToken(token: any): Promise<any> {
   try {
-    const response = await authApi.post("/v1/auth/refresh-token", {
+    const response = await authApi.post("/auth/refresh-token", {
       refreshToken: token.refreshToken,
     });
 
