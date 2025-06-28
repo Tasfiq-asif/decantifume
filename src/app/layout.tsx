@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { LoadingProvider } from "@/lib/providers/LoadingProvider";
+import { ReduxProvider } from "@/lib/providers/ReduxProvider";
 import ToastProvider from "@/lib/providers/ToastProvider";
 
 // Load Roboto font with variable to prevent hydration issues
@@ -30,12 +31,14 @@ export default function RootLayout({
         className="font-sans antialiased bg-background text-foreground min-h-screen"
         suppressHydrationWarning={true}
       >
-        <AuthProvider>
-          <LoadingProvider>
-            {children}
-            <ToastProvider />
-          </LoadingProvider>
-        </AuthProvider>
+        <ReduxProvider>
+          <AuthProvider>
+            <LoadingProvider>
+              {children}
+              <ToastProvider />
+            </LoadingProvider>
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

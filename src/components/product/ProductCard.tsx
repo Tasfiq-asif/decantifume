@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useAppDispatch } from "@/lib/hooks/reduxHooks";
 import { addToCart } from "@/redux/slices/cartSlice";
+import { toast } from "sonner";
 
 export interface Product {
   id: string;
@@ -38,10 +39,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [justAdded, setJustAdded] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleAddToCart = () => {
@@ -61,12 +60,15 @@ export function ProductCard({ product }: ProductCardProps) {
       })
     );
 
-    // Show success feedback
+    // Show toast notification
+    toast.success(`${product.name} added to cart!`, {
+      description: `Size: ${size} - $${price.toFixed(2)}`,
+    });
+
+    // Reset button state
     setTimeout(() => {
       setIsAdding(false);
-      setJustAdded(true);
-      setTimeout(() => setJustAdded(false), 2000);
-    }, 500);
+    }, 1000);
   };
 
   const currentPrice = selectedSize
@@ -74,88 +76,97 @@ export function ProductCard({ product }: ProductCardProps) {
     : product.price;
 
   return (
-    <Card
-      className="group overflow-hidden border-none bg-transparent shadow-none transition-all"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <div className="relative aspect-square overflow-hidden">
         <Link href={`/product/${product.id}`}>
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className={`object-cover transition-transform duration-300 ${
-              isHovered ? "scale-110" : "scale-100"
-            }`}
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
           {product.isNew && (
-            <Badge variant="default" className="bg-primary text-white">
+            <Badge variant="default" className="bg-primary text-white text-xs">
               New
             </Badge>
           )}
           {product.isBestSeller && (
-            <Badge variant="secondary">Best Seller</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Best Seller
+            </Badge>
           )}
         </div>
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-3 opacity-0 transition-opacity group-hover:opacity-100">
-          {/* Size Selection */}
-          {product.sizes.length > 1 && (
-            <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="bg-background/90 backdrop-blur-sm">
-                <SelectValue placeholder="Select size" />
-              </SelectTrigger>
-              <SelectContent>
-                {product.sizes.map((size) => (
-                  <SelectItem key={size.id} value={size.size}>
-                    {size.size} - ${size.price.toFixed(2)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="default"
-              onClick={handleAddToCart}
-              disabled={isAdding}
-              className="flex-1"
-            >
-              {isAdding ? (
-                "Adding..."
-              ) : justAdded ? (
-                <>
-                  <Check className="mr-2 h-4 w-4" />
-                  Added!
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to Cart
-                </>
-              )}
-            </Button>
-            <Button size="sm" variant="outline" className="bg-background/80">
-              <Heart className="h-4 w-4" />
-              <span className="sr-only">Add to Wishlist</span>
-            </Button>
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 " />
+
+        {/* Action Buttons */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+          <div className="flex flex-col gap-3">
+            {/* Size Selection */}
+            {product.sizes.length > 1 && (
+              <Select value={selectedSize} onValueChange={setSelectedSize}>
+                <SelectTrigger className="w-full bg-white text-black border-0 h-9 text-sm font-medium">
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.sizes.map((size) => (
+                    <SelectItem key={size.id} value={size.size}>
+                      {size.size} - ${size.price.toFixed(2)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="flex-1 bg-primary hover:bg-primary/90 text-white border-0 h-9 font-medium"
+              >
+                {isAdding ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Added!
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add to Cart
+                  </>
+                )}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="bg-white hover:bg-gray-100 text-black border-0 h-9"
+              >
+                <Heart className="h-4 w-4" />
+                <span className="sr-only">Add to Wishlist</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-      <CardContent className="p-4 pt-6">
-        <div className="text-xs text-muted-foreground mb-1">
+
+      <CardContent className="p-4">
+        <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
           {product.brand}
         </div>
         <Link
           href={`/product/${product.id}`}
-          className="group-hover:text-primary"
+          className="block group-hover:text-primary transition-colors"
         >
-          <h3 className="font-medium leading-tight mb-2">{product.name}</h3>
+          <h3 className="font-medium leading-tight mb-2 line-clamp-2">
+            {product.name}
+          </h3>
         </Link>
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold">
