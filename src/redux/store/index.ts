@@ -6,12 +6,14 @@ import { combineReducers } from "@reduxjs/toolkit";
 import cartSlice from "../slices/cartSlice";
 import userSlice from "../slices/userSlice";
 import productSlice from "../slices/productSlice";
+import orderSlice from "../slices/orderSlice";
 
 // Core reducers that are always loaded
 const coreReducers = {
   cart: cartSlice,
   user: userSlice, // Handles all auth state with NextAuth sync
   products: productSlice, // Product management and loading
+  orders: orderSlice, // Order management and loading
 };
 
 // Create initial root reducer with core reducers
