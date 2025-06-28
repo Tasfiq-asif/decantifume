@@ -137,6 +137,7 @@ export default function CartPage() {
       router.push("/login?redirect=/cart");
       return;
     }
+    setCheckoutStep("shipping");
     setShowCheckoutModal(true);
   };
 
