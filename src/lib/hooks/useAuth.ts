@@ -1,4 +1,5 @@
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "./reduxHooks";
 import {
   setUserFromSession,
@@ -6,16 +7,19 @@ import {
   setLoading,
   setError,
 } from "@/redux/slices/userSlice";
-import { useEffect } from "react";
+import { clearCart } from "@/redux/slices/cartSlice";
+import { useEffect, useRef } from "react";
 import { useLoading } from "@/lib/providers/LoadingProvider";
 
 export const useAuth = () => {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user);
   const { setLoading: setGlobalLoading } = useLoading();
+  const previousUserIdRef = useRef<string | null>(null);
 
-  // Sync NextAuth session with Redux
+  // Sync NextAuth session with Redux and handle user changes
   useEffect(() => {
     if (status === "loading") {
       dispatch(setLoading(true));
@@ -23,6 +27,18 @@ export const useAuth = () => {
     }
 
     if (status === "authenticated" && session) {
+      const currentUserId = session.user.id;
+
+      // Check if user has changed (different user logged in)
+      if (
+        previousUserIdRef.current &&
+        previousUserIdRef.current !== currentUserId
+      ) {
+        // Clear cart when switching to a different user
+        dispatch(clearCart());
+      }
+
+      // Update the user state
       dispatch(
         setUserFromSession({
           user: {
@@ -34,8 +50,14 @@ export const useAuth = () => {
           accessToken: session.accessToken,
         })
       );
+
+      // Update the ref with current user
+      previousUserIdRef.current = currentUserId;
     } else if (status === "unauthenticated") {
+      // Clear user state and cart on logout
       dispatch(clearUser());
+      dispatch(clearCart());
+      previousUserIdRef.current = null;
     }
   }, [session, status, dispatch]);
 
@@ -77,7 +99,12 @@ export const useAuth = () => {
       setGlobalLoading(true, "Signing you out...");
       await signOut({ redirect: false });
       dispatch(clearUser());
+      dispatch(clearCart()); // Clear cart on logout
       setGlobalLoading(false);
+
+      // Redirect to login page after logout
+      router.push("/login");
+
       return { success: true };
     } catch (error) {
       const errorMessage =
