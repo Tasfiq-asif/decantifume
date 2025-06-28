@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import { usePageLoading } from "@/lib/hooks/usePageLoading";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 
 // Transform Redux product to ProductCard format
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const transformProduct = (product: any) => ({
   id: product._id,
   name: product.name,

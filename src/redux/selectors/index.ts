@@ -30,6 +30,24 @@ export const selectProductFilters = (state: RootState) =>
 export const selectProductPagination = (state: RootState) =>
   state.products.pagination;
 
+// Order selectors
+export const selectOrders = (state: RootState) => state.orders.orders;
+export const selectCurrentOrder = (state: RootState) =>
+  state.orders.currentOrder;
+export const selectOrdersLoading = (state: RootState) => state.orders.loading;
+export const selectOrdersError = (state: RootState) => state.orders.error;
+export const selectOrderFilters = (state: RootState) => state.orders.filters;
+export const selectOrderPagination = (state: RootState) =>
+  state.orders.pagination;
+export const selectPaymentIntent = (state: RootState) =>
+  state.orders.paymentIntent;
+export const selectPaymentLoading = (state: RootState) =>
+  state.orders.paymentLoading;
+export const selectPaymentError = (state: RootState) =>
+  state.orders.paymentError;
+export const selectOrderCreation = (state: RootState) =>
+  state.orders.orderCreation;
+
 // Derived selectors
 export const selectFilteredProducts = (state: RootState) => {
   const products = selectProducts(state);
@@ -99,4 +117,30 @@ export const selectAvailableBrands = (state: RootState) => {
   const products = selectProducts(state);
   const brands = [...new Set(products.map((product) => product.brand))];
   return brands.sort();
+};
+
+// Order derived selectors
+export const selectOrdersByStatus = (status: string) => (state: RootState) => {
+  return selectOrders(state).filter((order) => order.orderStatus === status);
+};
+
+export const selectOrdersByPaymentStatus =
+  (status: string) => (state: RootState) => {
+    return selectOrders(state).filter(
+      (order) => order.paymentStatus === status
+    );
+  };
+
+export const selectPendingOrders = (state: RootState) => {
+  return selectOrders(state).filter((order) => order.orderStatus === "pending");
+};
+
+export const selectRecentOrders = (state: RootState) => {
+  return selectOrders(state)
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 5);
 };
