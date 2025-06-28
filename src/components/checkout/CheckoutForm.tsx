@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   useStripe,
   useElements,
@@ -9,16 +9,9 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { useOrders } from "@/lib/hooks/useOrders";
-import { useAppSelector } from "@/lib/hooks/reduxHooks";
-import { selectCartItems, selectCartTotal } from "@/redux/selectors";
 import { toast } from "sonner";
-import type { ShippingAddress } from "@/redux/slices/orderSlice";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -33,11 +26,9 @@ interface CheckoutFormProps {
 }
 
 function CheckoutFormContent({
-  clientSecret,
-  orderId,
   onSuccess,
   onError,
-}: CheckoutFormProps) {
+}: Pick<CheckoutFormProps, "onSuccess" | "onError">) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -67,9 +58,11 @@ function CheckoutFormContent({
         onSuccess();
         toast.success("Payment successful!");
       }
-    } catch (err: any) {
-      onError(err.message || "Payment failed");
-      toast.error(err.message || "Payment failed");
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Payment failed";
+      onError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
     }

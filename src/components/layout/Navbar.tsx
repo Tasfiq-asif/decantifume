@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import { ShoppingCart, Menu, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -30,15 +31,18 @@ export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { navigateWithLoading } = usePageLoading();
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await logout();
-  };
+  }, [logout]);
 
-  const handleNavigation = (href: string, name: string) => {
-    if (pathname !== href) {
-      navigateWithLoading(href, `Loading ${name}...`);
-    }
-  };
+  const handleNavigation = useCallback(
+    (href: string, name: string) => {
+      if (pathname !== href) {
+        navigateWithLoading(href, `Loading ${name}...`);
+      }
+    },
+    [pathname, navigateWithLoading]
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
@@ -113,51 +117,60 @@ export function Navbar() {
             <DropdownMenuContent align="end">
               {isAuthenticated ? (
                 <>
-                  <DropdownMenuItem>
-                    <span className="text-sm font-medium">{user?.name}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() =>
-                      handleNavigation(
-                        user?.role === "admin"
-                          ? "/dashboard/admin"
-                          : "/dashboard/user",
-                        "Dashboard"
-                      )
-                    }
-                  >
-                    <span className="w-full">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user?.name}
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <button
+                      onClick={() =>
+                        handleNavigation(
+                          user?.role === "admin"
+                            ? "/dashboard/admin"
+                            : "/dashboard/user",
+                          "Dashboard"
+                        )
+                      }
+                      className="w-full text-left"
+                    >
                       {user?.role === "admin"
                         ? "Admin Dashboard"
                         : "My Dashboard"}
-                    </span>
+                    </button>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() =>
-                      handleNavigation("/dashboard/user/orders", "Orders")
-                    }
-                  >
-                    <span className="w-full">My Orders</span>
+                  <DropdownMenuItem asChild>
+                    <button
+                      onClick={() =>
+                        handleNavigation("/dashboard/user/orders", "Orders")
+                      }
+                      className="w-full text-left"
+                    >
+                      My Orders
+                    </button>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() =>
-                      handleNavigation("/dashboard/user/wishlist", "Wishlist")
-                    }
-                  >
-                    <span className="w-full">Wishlist</span>
+                  <DropdownMenuItem asChild>
+                    <button
+                      onClick={() =>
+                        handleNavigation("/dashboard/user/wishlist", "Wishlist")
+                      }
+                      className="w-full text-left"
+                    >
+                      Wishlist
+                    </button>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <span className="w-full">Sign Out</span>
+                  <DropdownMenuItem asChild>
+                    <button onClick={handleLogout} className="w-full text-left">
+                      Sign Out
+                    </button>
                   </DropdownMenuItem>
                 </>
               ) : (
                 <>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/login" className="w-full">
                       Sign In
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/register" className="w-full">
                       Create Account
                     </Link>

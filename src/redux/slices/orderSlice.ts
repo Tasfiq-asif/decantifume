@@ -379,7 +379,7 @@ const orderSlice = createSlice({
         state.paymentLoading = true;
         state.paymentError = null;
       })
-      .addCase(confirmPayment.fulfilled, (state, action) => {
+      .addCase(confirmPayment.fulfilled, (state) => {
         state.paymentLoading = false;
         // Update the current order with payment confirmation
         if (state.currentOrder) {

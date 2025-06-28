@@ -184,8 +184,10 @@ export default function CartPage() {
       });
 
       setCheckoutStep("payment");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create order");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create order";
+      toast.error(errorMessage);
     }
   };
 

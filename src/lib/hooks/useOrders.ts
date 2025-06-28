@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "./reduxHooks";
 import {
   createOrder,
@@ -103,13 +104,13 @@ export const useOrders = () => {
     dispatch(clearError());
   };
 
-  const clearPayment = () => {
+  const clearPayment = useCallback(() => {
     dispatch(clearPaymentIntent());
-  };
+  }, [dispatch]);
 
-  const resetCreation = () => {
+  const resetCreation = useCallback(() => {
     dispatch(resetOrderCreation());
-  };
+  }, [dispatch]);
 
   // Helper methods
   const filterByStatus = (status: string) => {
