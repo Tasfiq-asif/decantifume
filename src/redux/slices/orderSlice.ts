@@ -62,6 +62,15 @@ export interface CreateOrderData {
   discount?: number;
   totalAmount: number;
   paymentMethod: "stripe" | "paypal" | "cash_on_delivery";
+  paymentIntentId?: string;
+  paymentStatus?: "pending" | "paid" | "failed" | "refunded" | "cancelled";
+  orderStatus?:
+    | "pending"
+    | "confirmed"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
   promoCode?: string;
   notes?: string;
 }

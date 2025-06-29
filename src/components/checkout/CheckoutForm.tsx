@@ -53,10 +53,21 @@ function CheckoutFormContent({
         onError(error.message || "Payment failed");
         toast.error(error.message || "Payment failed");
       } else if (paymentIntent?.status === "succeeded") {
-        // Confirm payment on our backend
-        await confirmOrderPayment(paymentIntent.id);
-        onSuccess(paymentIntent.id);
-        toast.success("Payment successful!");
+        try {
+          // Confirm payment on our backend
+          console.log("Confirming payment with intent ID:", paymentIntent.id);
+          const confirmResult = await confirmOrderPayment(paymentIntent.id);
+          console.log("Payment confirmation result:", confirmResult);
+          onSuccess(paymentIntent.id);
+          toast.success("Payment successful!");
+        } catch (confirmError) {
+          console.error("Payment confirmation failed:", confirmError);
+          // Payment succeeded on Stripe but backend confirmation failed
+          toast.error(
+            "Payment successful but order confirmation failed. Please contact support."
+          );
+          onError("Backend confirmation failed");
+        }
       }
     } catch (err: unknown) {
       const errorMessage =

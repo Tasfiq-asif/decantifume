@@ -71,9 +71,9 @@ export default function CartPage() {
   const [checkoutStep, setCheckoutStep] = useState<
     "cart" | "shipping" | "payment"
   >("cart");
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [shippingAddress, setShippingAddress] =
     useState<ShippingAddress | null>(null);
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
   // Calculate costs
   const shippingCost = totalAmount > 50 ? 0 : 9.99;
@@ -90,13 +90,17 @@ export default function CartPage() {
     }
   }, [showCheckoutModal, clearPayment, resetCreation]);
 
-  // Handle successful order creation
+  // Handle successful order creation - but NOT during payment flow
   useEffect(() => {
-    if (orderCreation.success && !showCheckoutModal) {
+    if (
+      orderCreation.success &&
+      !showCheckoutModal &&
+      checkoutStep !== "payment"
+    ) {
       router.push("/dashboard/user/orders");
       toast.success("Order placed successfully!");
     }
-  }, [orderCreation.success, showCheckoutModal, router]);
+  }, [orderCreation.success, showCheckoutModal, checkoutStep, router]);
 
   const handleUpdateQuantity = (
     id: string,
@@ -142,14 +146,15 @@ export default function CartPage() {
   };
 
   const handleShippingSubmit = async (address: ShippingAddress) => {
-    setShippingAddress(address);
-
     try {
-      // Initialize payment FIRST (don't create order yet)
+      // Store the shipping address for later use
+      setShippingAddress(address);
+
+      // Step 1: Create payment intent FIRST (traditional e-commerce flow)
       await initializePayment({
-        amount: finalTotal * 100, // Stripe expects amount in cents
+        amount: finalTotal, // Backend converts to cents
         currency: "usd",
-        orderId: "pending", // Temporary ID since we haven't created the order yet
+        orderId: "temp_order", // Temporary - we'll create real order after payment
         customerEmail: address.email,
         metadata: {
           customerName: `${address.firstName} ${address.lastName}`,
@@ -158,6 +163,19 @@ export default function CartPage() {
           tax: tax.toString(),
           discount: discount.toString(),
           promoCode: promoCode || "",
+          // Store all order data in metadata for order creation after payment
+          shippingData: JSON.stringify(address),
+          cartData: JSON.stringify(
+            cartItems.map((item) => ({
+              product: item.id,
+              productName: item.name,
+              productImage: item.image,
+              decantSize: item.size || "5ml",
+              price: item.price,
+              quantity: item.quantity,
+              totalPrice: item.price * item.quantity,
+            }))
+          ),
         },
       });
 
@@ -170,12 +188,20 @@ export default function CartPage() {
   };
 
   const handlePaymentSuccess = async (paymentIntentId?: string) => {
+    if (!paymentIntentId) {
+      toast.error("Payment intent ID is missing");
+      return;
+    }
+
     if (!shippingAddress) {
       toast.error("Shipping address is missing");
       return;
     }
 
     try {
+      // Now create the order AFTER successful payment
+      console.log("Payment succeeded, creating order...");
+
       // Create order items from cart
       const orderItems: OrderItem[] = cartItems.map((item) => ({
         product: item.id,
@@ -187,7 +213,7 @@ export default function CartPage() {
         totalPrice: item.price * item.quantity,
       }));
 
-      // Create order data
+      // Create order data with stored shipping address
       const orderData: CreateOrderData = {
         items: orderItems,
         shippingAddress,
@@ -197,23 +223,30 @@ export default function CartPage() {
         discount,
         totalAmount: finalTotal,
         paymentMethod: "stripe",
+        paymentIntentId, // Store the Stripe payment intent ID
+        paymentStatus: "paid", // Set as paid since payment already succeeded
+        orderStatus: "confirmed", // Set as confirmed since payment succeeded
         promoCode: promoCode || undefined,
       };
 
-      // Create the order AFTER successful payment
       await placeOrder(orderData);
 
-      // Log payment intent ID for tracking
-      console.log("Payment completed with intent ID:", paymentIntentId);
+      console.log("Order created successfully after payment");
+
+      // Clear the cart after successful order
+      dispatch(clearCart());
 
       setShowCheckoutModal(false);
-      toast.success("Order placed successfully! Redirecting to your orders...");
+      toast.success("Payment successful! Order created. Redirecting...");
+
       setTimeout(() => {
         router.push("/dashboard/user/orders");
       }, 2000);
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to create order";
+        error instanceof Error
+          ? error.message
+          : "Failed to create order after payment";
       toast.error(errorMessage);
     }
   };
