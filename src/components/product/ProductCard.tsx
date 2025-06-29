@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Heart, Check } from "lucide-react";
@@ -38,7 +38,10 @@ interface ProductCardProps {
   product: Product;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+// OPTIMIZED: Memoized ProductCard to prevent unnecessary re-renders
+export const ProductCard = memo(function ProductCard({
+  product,
+}: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const dispatch = useAppDispatch();
@@ -187,4 +190,4 @@ export function ProductCard({ product }: ProductCardProps) {
       </CardContent>
     </Card>
   );
-}
+});

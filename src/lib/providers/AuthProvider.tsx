@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { ReduxProvider } from "./ReduxProvider";
+import ReduxProvider from "./ReduxProvider";
 import { ReactNode } from "react";
 
 interface AuthProviderProps {

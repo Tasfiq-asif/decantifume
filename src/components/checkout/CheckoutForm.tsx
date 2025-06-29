@@ -21,7 +21,7 @@ const stripePromise = loadStripe(
 interface CheckoutFormProps {
   clientSecret: string;
   orderId: string;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId?: string) => void;
   onError: (error: string) => void;
 }
 
@@ -55,7 +55,7 @@ function CheckoutFormContent({
       } else if (paymentIntent?.status === "succeeded") {
         // Confirm payment on our backend
         await confirmOrderPayment(paymentIntent.id);
-        onSuccess();
+        onSuccess(paymentIntent.id);
         toast.success("Payment successful!");
       }
     } catch (err: unknown) {

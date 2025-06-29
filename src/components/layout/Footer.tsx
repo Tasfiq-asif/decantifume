@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Instagram, Facebook, Twitter } from "lucide-react";
 
 export function Footer() {
-  const [currentYear, setCurrentYear] = useState(2024);
-
-  useEffect(() => {
-    // Update the year on the client side only
-    setCurrentYear(new Date().getFullYear());
-  }, []);
+  // Get current year - will be the same on server and client
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-background border-t">

@@ -26,14 +26,11 @@ import {
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { ShippingForm } from "@/components/checkout/ShippingForm";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { useAppSelector, useAppDispatch } from "@/lib/hooks/reduxHooks";
+import { Loading } from "@/components/ui/loading";
+import { useAppDispatch } from "@/lib/hooks/reduxHooks";
 import { useOrders } from "@/lib/hooks/useOrders";
 import { useAuth } from "@/lib/hooks/useAuth";
-import {
-  selectCartItems,
-  selectCartTotal,
-  selectCartTotalQuantity,
-} from "@/redux/selectors";
+import { useCart } from "@/lib/hooks/useCart";
 import {
   updateQuantity,
   removeFromCart,
@@ -50,9 +47,12 @@ export default function CartPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
-  const cartItems = useAppSelector(selectCartItems);
-  const totalAmount = useAppSelector(selectCartTotal);
-  const totalQuantity = useAppSelector(selectCartTotalQuantity);
+  const {
+    items: cartItems,
+    totalAmount,
+    totalQuantity,
+    isHydrated: isCartHydrated,
+  } = useCart();
 
   const {
     placeOrder,
@@ -144,47 +144,73 @@ export default function CartPage() {
   const handleShippingSubmit = async (address: ShippingAddress) => {
     setShippingAddress(address);
 
-    // Create order items from cart
-    const orderItems: OrderItem[] = cartItems.map((item) => ({
-      product: item.id,
-      productName: item.name,
-      productImage: item.image,
-      decantSize: item.size || "5ml", // Default to 5ml if not specified
-      price: item.price,
-      quantity: item.quantity,
-      totalPrice: item.price * item.quantity,
-    }));
-
-    // Create order data
-    const orderData: CreateOrderData = {
-      items: orderItems,
-      shippingAddress: address,
-      subtotal: totalAmount,
-      shippingCost,
-      tax,
-      discount,
-      totalAmount: finalTotal,
-      paymentMethod: "stripe",
-      promoCode: promoCode || undefined,
-    };
-
     try {
-      // Create the order first
-      const order = await placeOrder(orderData);
-
-      // Initialize payment
+      // Initialize payment FIRST (don't create order yet)
       await initializePayment({
-        amount: finalTotal,
+        amount: finalTotal * 100, // Stripe expects amount in cents
         currency: "usd",
-        orderId: order._id,
+        orderId: "pending", // Temporary ID since we haven't created the order yet
         customerEmail: address.email,
         metadata: {
-          orderNumber: order.orderNumber,
           customerName: `${address.firstName} ${address.lastName}`,
+          subtotal: totalAmount.toString(),
+          shippingCost: shippingCost.toString(),
+          tax: tax.toString(),
+          discount: discount.toString(),
+          promoCode: promoCode || "",
         },
       });
 
       setCheckoutStep("payment");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to initialize payment";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId?: string) => {
+    if (!shippingAddress) {
+      toast.error("Shipping address is missing");
+      return;
+    }
+
+    try {
+      // Create order items from cart
+      const orderItems: OrderItem[] = cartItems.map((item) => ({
+        product: item.id,
+        productName: item.name,
+        productImage: item.image,
+        decantSize: item.size || "5ml",
+        price: item.price,
+        quantity: item.quantity,
+        totalPrice: item.price * item.quantity,
+      }));
+
+      // Create order data
+      const orderData: CreateOrderData = {
+        items: orderItems,
+        shippingAddress,
+        subtotal: totalAmount,
+        shippingCost,
+        tax,
+        discount,
+        totalAmount: finalTotal,
+        paymentMethod: "stripe",
+        promoCode: promoCode || undefined,
+      };
+
+      // Create the order AFTER successful payment
+      await placeOrder(orderData);
+
+      // Log payment intent ID for tracking
+      console.log("Payment completed with intent ID:", paymentIntentId);
+
+      setShowCheckoutModal(false);
+      toast.success("Order placed successfully! Redirecting to your orders...");
+      setTimeout(() => {
+        router.push("/dashboard/user/orders");
+      }, 2000);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create order";
@@ -192,18 +218,16 @@ export default function CartPage() {
     }
   };
 
-  const handlePaymentSuccess = () => {
-    setShowCheckoutModal(false);
-    toast.success("Payment successful! Redirecting to your orders...");
-    setTimeout(() => {
-      router.push("/dashboard/user/orders");
-    }, 2000);
-  };
-
   const handlePaymentError = (error: string) => {
     toast.error(error);
   };
 
+  // Show loading state while cart is hydrating
+  if (!isCartHydrated) {
+    return <Loading fullscreen message="Loading your cart..." />;
+  }
+
+  // Show empty cart state after hydration is complete
   if (cartItems.length === 0) {
     return (
       <SiteLayout>
@@ -521,7 +545,7 @@ export default function CartPage() {
                   <CardContent>
                     <CheckoutForm
                       clientSecret={paymentIntent.clientSecret}
-                      orderId={shippingAddress ? "order-id" : ""}
+                      orderId="pending"
                       onSuccess={handlePaymentSuccess}
                       onError={handlePaymentError}
                     />

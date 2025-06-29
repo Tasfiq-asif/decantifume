@@ -1,4 +1,5 @@
 // src/redux/selectors/index.ts
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
 // User selectors
@@ -13,6 +14,7 @@ export const selectCartTotal = (state: RootState) => state.cart.totalAmount;
 export const selectCartTotalQuantity = (state: RootState) =>
   state.cart.totalQuantity;
 export const selectCartIsOpen = (state: RootState) => state.cart.isOpen;
+export const selectCartIsHydrated = (state: RootState) => state.cart.isHydrated;
 
 // Product selectors
 export const selectProducts = (state: RootState) => state.products.products;
@@ -48,51 +50,51 @@ export const selectPaymentError = (state: RootState) =>
 export const selectOrderCreation = (state: RootState) =>
   state.orders.orderCreation;
 
-// Derived selectors
-export const selectFilteredProducts = (state: RootState) => {
-  const products = selectProducts(state);
-  const filters = selectProductFilters(state);
+// FIXED: Memoized derived selectors using createSelector
+export const selectFilteredProducts = createSelector(
+  [selectProducts, selectProductFilters],
+  (products, filters) => {
+    return products.filter((product) => {
+      // Apply filters
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const matchesSearch =
+          product.name.toLowerCase().includes(searchLower) ||
+          product.brand.toLowerCase().includes(searchLower) ||
+          product.description.toLowerCase().includes(searchLower) ||
+          product.tags.some((tag) => tag.toLowerCase().includes(searchLower));
 
-  return products.filter((product) => {
-    // Apply filters
-    if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchLower) ||
-        product.brand.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower) ||
-        product.tags.some((tag) => tag.toLowerCase().includes(searchLower));
+        if (!matchesSearch) return false;
+      }
 
-      if (!matchesSearch) return false;
-    }
+      if (filters.category && product.category !== filters.category) {
+        return false;
+      }
 
-    if (filters.category && product.category !== filters.category) {
-      return false;
-    }
+      if (
+        filters.brand &&
+        !product.brand.toLowerCase().includes(filters.brand.toLowerCase())
+      ) {
+        return false;
+      }
 
-    if (
-      filters.brand &&
-      !product.brand.toLowerCase().includes(filters.brand.toLowerCase())
-    ) {
-      return false;
-    }
+      if (filters.status && product.status !== filters.status) {
+        return false;
+      }
 
-    if (filters.status && product.status !== filters.status) {
-      return false;
-    }
+      // Price filtering (using minimum price from decant sizes)
+      if (filters.minPrice || filters.maxPrice) {
+        const minPrice = Math.min(
+          ...product.decantSizes.map((size) => size.price)
+        );
+        if (filters.minPrice && minPrice < filters.minPrice) return false;
+        if (filters.maxPrice && minPrice > filters.maxPrice) return false;
+      }
 
-    // Price filtering (using minimum price from decant sizes)
-    if (filters.minPrice || filters.maxPrice) {
-      const minPrice = Math.min(
-        ...product.decantSizes.map((size) => size.price)
-      );
-      if (filters.minPrice && minPrice < filters.minPrice) return false;
-      if (filters.maxPrice && minPrice > filters.maxPrice) return false;
-    }
-
-    return true;
-  });
-};
+      return true;
+    });
+  }
+);
 
 export const selectProductsByCategory =
   (category: string) => (state: RootState) => {
@@ -107,17 +109,25 @@ export const selectProductsByBrand = (brand: string) => (state: RootState) => {
   );
 };
 
-export const selectAvailableCategories = (state: RootState) => {
-  const products = selectProducts(state);
-  const categories = [...new Set(products.map((product) => product.category))];
-  return categories.sort();
-};
+// FIXED: Memoized available categories selector
+export const selectAvailableCategories = createSelector(
+  [selectProducts],
+  (products) => {
+    const categories = [
+      ...new Set(products.map((product) => product.category)),
+    ];
+    return categories.sort();
+  }
+);
 
-export const selectAvailableBrands = (state: RootState) => {
-  const products = selectProducts(state);
-  const brands = [...new Set(products.map((product) => product.brand))];
-  return brands.sort();
-};
+// FIXED: Memoized available brands selector
+export const selectAvailableBrands = createSelector(
+  [selectProducts],
+  (products) => {
+    const brands = [...new Set(products.map((product) => product.brand))];
+    return brands.sort();
+  }
+);
 
 // Order derived selectors
 export const selectOrdersByStatus = (status: string) => (state: RootState) => {
@@ -135,12 +145,13 @@ export const selectPendingOrders = (state: RootState) => {
   return selectOrders(state).filter((order) => order.orderStatus === "pending");
 };
 
-export const selectRecentOrders = (state: RootState) => {
-  return selectOrders(state)
+// FIXED: Memoized recent orders selector
+export const selectRecentOrders = createSelector([selectOrders], (orders) => {
+  return orders
     .slice()
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
     .slice(0, 5);
-};
+});

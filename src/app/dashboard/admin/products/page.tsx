@@ -23,7 +23,6 @@ import { AppDispatch } from "@/redux/store";
 import {
   fetchProducts,
   setFilters,
-  clearFilters,
   clearError,
 } from "@/redux/slices/productSlice";
 import {

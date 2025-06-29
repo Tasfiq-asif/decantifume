@@ -8,6 +8,19 @@ interface LoadingProps {
   message?: string;
 }
 
+// Deterministic positions and values to prevent hydration mismatches
+const PARTICLE_POSITIONS = [
+  { top: 15, left: 20 },
+  { top: 35, left: 75 },
+  { top: 60, left: 45 },
+  { top: 80, left: 85 },
+  { top: 25, left: 60 },
+  { top: 70, left: 15 },
+];
+
+const MIST_X_VALUES = [-3, 0, 3, -2, 2];
+const PARTICLE_DURATIONS = [3, 4, 5, 3.5, 4.5, 3.8];
+
 export function Loading({
   fullscreen = false,
   size = "md",
@@ -128,7 +141,7 @@ export function Loading({
                   }}
                   animate={{
                     y: [0, -20, -40],
-                    x: [0, Math.random() * 10 - 5],
+                    x: [0, MIST_X_VALUES[i] || 0],
                     opacity: [0.8, 0.4, 0],
                   }}
                   transition={{
@@ -142,13 +155,13 @@ export function Loading({
           </motion.div>
 
           {/* Floating particles around bottle */}
-          {[...Array(6)].map((_, i) => (
+          {PARTICLE_POSITIONS.map((position, i) => (
             <motion.div
               key={i}
               className="absolute w-2 h-2 bg-lavender-400/40 rounded-full"
               style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
+                top: `${position.top}%`,
+                left: `${position.left}%`,
               }}
               animate={{
                 y: [0, -20, 0],
@@ -156,7 +169,7 @@ export function Loading({
                 opacity: [0.3, 0.8, 0.3],
               }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: PARTICLE_DURATIONS[i] || 3,
                 repeat: Infinity,
                 delay: i * 0.3,
               }}

@@ -35,8 +35,8 @@ interface Order {
   shippingAddress: {
     street: string;
     city: string;
-    state: string;
     zipCode: string;
+    country: string;
   };
   trackingNumber?: string;
 }
@@ -69,8 +69,8 @@ export default function UserOrders() {
           shippingAddress: {
             street: "123 Main St",
             city: "New York",
-            state: "NY",
             zipCode: "10001",
+            country: "United States",
           },
         },
         {
@@ -97,8 +97,8 @@ export default function UserOrders() {
           shippingAddress: {
             street: "456 Oak Ave",
             city: "Los Angeles",
-            state: "CA",
             zipCode: "90210",
+            country: "United States",
           },
         },
         {
@@ -118,8 +118,8 @@ export default function UserOrders() {
           shippingAddress: {
             street: "789 Pine St",
             city: "Chicago",
-            state: "IL",
             zipCode: "60601",
+            country: "United States",
           },
         },
         {
@@ -139,8 +139,8 @@ export default function UserOrders() {
           shippingAddress: {
             street: "321 Elm St",
             city: "Miami",
-            state: "FL",
             zipCode: "33101",
+            country: "United States",
           },
         },
       ]);
@@ -373,8 +373,10 @@ export default function UserOrders() {
                   <p className="text-white text-sm">
                     {order.shippingAddress.street}
                     <br />
-                    {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                    {order.shippingAddress.city},{" "}
                     {order.shippingAddress.zipCode}
+                    <br />
+                    {order.shippingAddress.country}
                   </p>
                 </div>
 

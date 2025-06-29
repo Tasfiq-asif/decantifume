@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useAppSelector } from "@/lib/hooks/reduxHooks";
+import { useCart } from "@/lib/hooks/useCart";
 import { usePageLoading } from "@/lib/hooks/usePageLoading";
 
 const navigation = [
@@ -27,7 +27,7 @@ const navigation = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { totalQuantity } = useAppSelector((state) => state.cart);
+  const { totalQuantity, isHydrated: isCartHydrated } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
   const { navigateWithLoading } = usePageLoading();
 
@@ -183,7 +183,7 @@ export function Navbar() {
           <Button variant="ghost" size="icon" className="relative" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
-              {totalQuantity > 0 && (
+              {isCartHydrated && totalQuantity > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {totalQuantity}
                 </span>

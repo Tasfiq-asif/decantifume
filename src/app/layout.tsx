@@ -3,7 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { LoadingProvider } from "@/lib/providers/LoadingProvider";
-import { ReduxProvider } from "@/lib/providers/ReduxProvider";
+import ReduxProvider from "@/lib/providers/ReduxProvider";
 import ToastProvider from "@/lib/providers/ToastProvider";
 
 // Load Roboto font with variable to prevent hydration issues
