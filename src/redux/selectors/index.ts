@@ -155,3 +155,84 @@ export const selectRecentOrders = createSelector([selectOrders], (orders) => {
     )
     .slice(0, 5);
 });
+
+// Admin selectors
+export const selectAdminStats = (state: RootState) => state.admin.stats;
+export const selectAdminStatsLoading = (state: RootState) =>
+  state.admin.statsLoading;
+export const selectAdminStatsError = (state: RootState) =>
+  state.admin.statsError;
+
+export const selectUserStats = (state: RootState) => state.admin.userStats;
+export const selectUserStatsLoading = (state: RootState) =>
+  state.admin.userStatsLoading;
+export const selectUserStatsError = (state: RootState) =>
+  state.admin.userStatsError;
+
+export const selectRecentOrdersAdmin = (state: RootState) =>
+  state.admin.recentOrders;
+export const selectRecentOrdersAdminLoading = (state: RootState) =>
+  state.admin.recentOrdersLoading;
+export const selectRecentOrdersAdminError = (state: RootState) =>
+  state.admin.recentOrdersError;
+
+export const selectTopProducts = (state: RootState) => state.admin.topProducts;
+export const selectTopProductsLoading = (state: RootState) =>
+  state.admin.topProductsLoading;
+export const selectTopProductsError = (state: RootState) =>
+  state.admin.topProductsError;
+
+export const selectAllUsers = (state: RootState) => state.admin.users;
+export const selectAllUsersLoading = (state: RootState) =>
+  state.admin.usersLoading;
+export const selectAllUsersError = (state: RootState) => state.admin.usersError;
+export const selectUsersPagination = (state: RootState) =>
+  state.admin.usersPagination;
+
+export const selectAllOrdersAdmin = (state: RootState) => state.admin.allOrders;
+export const selectAllOrdersAdminLoading = (state: RootState) =>
+  state.admin.allOrdersLoading;
+export const selectAllOrdersAdminError = (state: RootState) =>
+  state.admin.allOrdersError;
+export const selectAllOrdersPagination = (state: RootState) =>
+  state.admin.allOrdersPagination;
+
+// Admin derived selectors
+export const selectAdminDashboardStats = createSelector(
+  [selectAdminStats, selectProducts],
+  (stats, products) => {
+    if (!stats) return null;
+
+    return {
+      ...stats,
+      totalProducts: products.length, // Use actual product count from products slice
+    };
+  }
+);
+
+export const selectFormattedRecentOrders = createSelector(
+  [selectRecentOrdersAdmin],
+  (orders) => {
+    return orders.map((order) => ({
+      id: order.orderNumber,
+      customerName: order.user.name,
+      amount: order.totalAmount,
+      status: order.orderStatus,
+      date: new Date(order.createdAt).toLocaleDateString(),
+    }));
+  }
+);
+
+export const selectFormattedTopProducts = createSelector(
+  [selectTopProducts],
+  (products) => {
+    return products.map((product) => ({
+      id: product._id,
+      name: `${product.name} (${product.decantSize})`,
+      sales: product.totalOrders,
+      revenue: product.totalRevenue,
+      quantity: product.totalQuantity,
+      brand: product.brand,
+    }));
+  }
+);

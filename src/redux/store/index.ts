@@ -7,6 +7,7 @@ import cartSlice from "../slices/cartSlice";
 import userSlice from "../slices/userSlice";
 import productSlice from "../slices/productSlice";
 import orderSlice from "../slices/orderSlice";
+import adminSlice from "../slices/adminSlice";
 
 // Core reducers that are always loaded
 const coreReducers = {
@@ -14,6 +15,7 @@ const coreReducers = {
   user: userSlice, // Handles all auth state with NextAuth sync
   products: productSlice, // Product management and loading
   orders: orderSlice, // Order management and loading
+  admin: adminSlice, // Admin dashboard and management
 };
 
 // Create initial root reducer with core reducers

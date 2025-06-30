@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,110 +17,132 @@ import {
   BarChart3,
 } from "lucide-react";
 
-interface DashboardStats {
-  totalUsers: number;
-  totalProducts: number;
-  totalOrders: number;
-  totalRevenue: number;
-  monthlyGrowth: number;
-  recentOrders: Array<{
-    id: string;
-    customerName: string;
-    amount: number;
-    status: string;
-    date: string;
-  }>;
-  topProducts: Array<{
-    id: string;
-    name: string;
-    sales: number;
-    revenue: number;
-  }>;
-}
+// Redux imports
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import {
+  fetchAdminStats,
+  fetchRecentOrders,
+  fetchTopProducts,
+  fetchUserStats,
+} from "@/redux/slices/adminSlice";
+import {
+  selectAdminDashboardStats,
+  selectFormattedRecentOrders,
+  selectFormattedTopProducts,
+  selectAdminStatsError,
+  selectUserStats,
+  selectUserStatsLoading,
+  selectUserStatsError,
+} from "@/redux/selectors";
 
 export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    // Don't redirect if user is still loading
-    if (user === null) {
+  // Redux selectors
+  const stats = useSelector(selectAdminDashboardStats);
+  const recentOrders = useSelector(selectFormattedRecentOrders);
+  const topProducts = useSelector(selectFormattedTopProducts);
+
+  // Error states
+  const statsError = useSelector(selectAdminStatsError);
+
+  // User stats
+  const userStats = useSelector(selectUserStats);
+  const userStatsLoading = useSelector(selectUserStatsLoading);
+  const userStatsError = useSelector(selectUserStatsError);
+
+  const [loading, setLoading] = useState(true);
+  const hasLoadedData = useRef(false);
+  const isLoadingData = useRef(false);
+  const authStateStable = useRef(false);
+
+  // Memoized data loading function to prevent re-creation on every render
+  const loadDashboardData = useCallback(async () => {
+    // Multiple protection layers
+    if (hasLoadedData.current || isLoadingData.current) {
+      console.log("⏩ Skipping data load - already loaded or loading");
       return;
     }
 
+    console.log("🔄 Loading admin dashboard data..."); // Debug log
+    isLoadingData.current = true;
+
+    try {
+      hasLoadedData.current = true;
+
+      // Fetch all admin data in parallel
+      await Promise.all([
+        dispatch(fetchAdminStats()),
+        dispatch(fetchRecentOrders(5)),
+        dispatch(fetchTopProducts(3)),
+        dispatch(fetchUserStats()),
+      ]);
+
+      console.log("✅ Admin dashboard data loaded successfully"); // Debug log
+    } catch (error) {
+      console.error("❌ Failed to load dashboard data:", error);
+      hasLoadedData.current = false; // Allow retry on error
+    } finally {
+      setLoading(false);
+      isLoadingData.current = false;
+    }
+  }, []); // Remove dispatch dependency to prevent recreation
+
+  // Separate effect to handle authentication and data loading
+  useEffect(() => {
+    console.log("🏃 AdminDashboard useEffect running", {
+      isAuthenticated,
+      user: user?.role,
+      hasLoadedData: hasLoadedData.current,
+      isLoadingData: isLoadingData.current,
+    });
+
+    // Wait for user to be determined
+    if (user === null) {
+      console.log("⏸️ Waiting for user authentication...");
+      return;
+    }
+
+    // Handle authentication redirects
     if (!isAuthenticated) {
+      console.log("🔄 Redirecting to login...");
       router.push("/login");
       return;
     }
 
     if (user?.role !== "admin") {
+      console.log("🔄 Redirecting to user dashboard...");
       router.push("/dashboard/user");
       return;
     }
 
-    // Load dashboard data - replace with actual API calls
-    const loadDashboardData = async () => {
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
+    // Only load data if auth is stable and we haven't loaded yet
+    if (!authStateStable.current) {
+      authStateStable.current = true;
+      console.log("✅ Auth state stabilized, loading data...");
+      // Add a small delay to ensure auth state is fully settled
+      setTimeout(() => {
+        loadDashboardData();
+      }, 100);
+    }
+  }, [isAuthenticated, user?.role, router]); // Removed loadDashboardData dependency
 
-        setStats({
-          totalUsers: 1234,
-          totalProducts: 89,
-          totalOrders: 456,
-          totalRevenue: 45600,
-          monthlyGrowth: 12.5,
-          recentOrders: [
-            {
-              id: "ORD001",
-              customerName: "John Doe",
-              amount: 129.99,
-              status: "completed",
-              date: "2024-01-15",
-            },
-            {
-              id: "ORD002",
-              customerName: "Jane Smith",
-              amount: 89.5,
-              status: "pending",
-              date: "2024-01-15",
-            },
-            {
-              id: "ORD003",
-              customerName: "Mike Johnson",
-              amount: 199.99,
-              status: "processing",
-              date: "2024-01-14",
-            },
-          ],
-          topProducts: [
-            {
-              id: "PROD001",
-              name: "Premium Cologne",
-              sales: 45,
-              revenue: 2250,
-            },
-            { id: "PROD002", name: "Luxury Perfume", sales: 38, revenue: 1900 },
-            {
-              id: "PROD003",
-              name: "Eau de Toilette",
-              sales: 32,
-              revenue: 1600,
-            },
-          ],
-        });
-      } catch (error) {
-        console.error("Failed to load dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Manual retry function that resets all flags
+  const handleRetry = useCallback(() => {
+    console.log("🔄 Manual retry triggered");
+    hasLoadedData.current = false;
+    isLoadingData.current = false;
+    authStateStable.current = false;
+    setLoading(true);
+    setTimeout(() => {
+      loadDashboardData();
+    }, 100);
+  }, [loadDashboardData]);
 
-    loadDashboardData();
-  }, [isAuthenticated, user, router]);
-
+  // Simplified loading condition - only check local loading state
   if (loading || user === null) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800">
@@ -132,16 +154,84 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!stats) return null;
+  // Show error state with more specific messaging
+  if (statsError) {
+    const errorMessage = statsError;
+    const isRateLimit = errorMessage?.includes("Too many requests");
+
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+            {isRateLimit ? (
+              <svg
+                className="w-8 h-8 text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.732 8.5c-.77.833-.192 2.5 1.338 2.5z"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-8 h-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            )}
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {isRateLimit ? "Server Busy" : "Failed to Load Dashboard"}
+          </h3>
+          <p className="text-gray-600 mb-4">{errorMessage}</p>
+          <Button
+            onClick={handleRetry}
+            className="bg-lavender-600 hover:bg-lavender-700"
+          >
+            {isRateLimit ? "Try Again" : "Retry"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Early return if stats are not loaded yet
+  if (!stats) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lavender-600 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading Admin Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
+      case "delivered":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "processing":
+      case "confirmed":
         return "bg-blue-100 text-blue-800";
+      case "shipped":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -169,9 +259,21 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
-              {stats.totalUsers.toLocaleString()}
+              {userStatsLoading ? (
+                <div className="animate-pulse bg-white/20 rounded h-8 w-16"></div>
+              ) : userStatsError ? (
+                "Error"
+              ) : (
+                userStats?.totalUsers || 0
+              )}
             </div>
-            <p className="text-xs text-lavender-300">+12% from last month</p>
+            <p className="text-xs text-lavender-300">
+              {userStatsLoading
+                ? "Loading..."
+                : userStats
+                ? `${userStats.activeUsers} active, ${userStats.adminUsers} admins`
+                : "User analytics"}
+            </p>
           </CardContent>
         </Card>
 
@@ -186,7 +288,7 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-white">
               {stats.totalProducts}
             </div>
-            <p className="text-xs text-lavender-300">+3 new this week</p>
+            <p className="text-xs text-lavender-300">Active products</p>
           </CardContent>
         </Card>
 
@@ -201,7 +303,9 @@ export default function AdminDashboard() {
             <div className="text-2xl font-bold text-white">
               {stats.totalOrders}
             </div>
-            <p className="text-xs text-lavender-300">+23 from yesterday</p>
+            <p className="text-xs text-lavender-300">
+              {stats.pendingOrders} pending
+            </p>
           </CardContent>
         </Card>
 
@@ -214,11 +318,11 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
-              ${stats.totalRevenue.toLocaleString()}
+              ${stats.totalRevenue.toFixed(2)}
             </div>
             <p className="text-xs text-lavender-300 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />+{stats.monthlyGrowth}%
-              from last month
+              <TrendingUp className="h-3 w-3 mr-1" />
+              Avg: ${stats.averageOrderValue.toFixed(2)} per order
             </p>
           </CardContent>
         </Card>
@@ -268,27 +372,34 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.recentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                >
-                  <div>
-                    <p className="text-white font-medium">
-                      {order.customerName}
-                    </p>
-                    <p className="text-lavender-300 text-sm">
-                      {order.id} • {order.date}
-                    </p>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                  >
+                    <div>
+                      <p className="text-white font-medium">
+                        {order.customerName}
+                      </p>
+                      <p className="text-lavender-300 text-sm">
+                        {order.id} • {order.date}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-medium">${order.amount}</p>
+                      <Badge className={getStatusColor(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-white font-medium">${order.amount}</p>
-                    <Badge className={getStatusColor(order.status)}>
-                      {order.status}
-                    </Badge>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <ShoppingCart className="h-12 w-12 mx-auto text-lavender-300 mb-4" />
+                  <p className="text-lavender-300">No recent orders found</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -303,23 +414,34 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.topProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                >
-                  <div>
-                    <p className="text-white font-medium">{product.name}</p>
-                    <p className="text-lavender-300 text-sm">
-                      {product.sales} sales
-                    </p>
+              {topProducts.length > 0 ? (
+                topProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                  >
+                    <div>
+                      <p className="text-white font-medium">{product.name}</p>
+                      <p className="text-lavender-300 text-sm">
+                        {product.brand} • {product.quantity} units sold
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-medium">
+                        ${product.revenue.toFixed(2)}
+                      </p>
+                      <p className="text-lavender-300 text-sm">
+                        {product.sales} orders
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-white font-medium">${product.revenue}</p>
-                    <p className="text-lavender-300 text-sm">Revenue</p>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Package className="h-12 w-12 mx-auto text-lavender-300 mb-4" />
+                  <p className="text-lavender-300">No product data available</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
