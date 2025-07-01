@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import { User, ShoppingBag, MapPin, Settings, Package } from "lucide-react";
+import { User, ShoppingBag, Settings, Package } from "lucide-react";
 import { Loading } from "@/components/ui/loading";
 
 interface UserDashboardData {
@@ -251,8 +251,10 @@ export default function UserDashboard() {
         >
           <User className="h-6 w-6 mr-3" />
           <div className="text-left">
-            <div className="font-semibold">Profile & Addresses</div>
-            <div className="text-sm opacity-90">Manage personal info</div>
+            <div className="font-semibold">My Profile</div>
+            <div className="text-sm opacity-90">
+              Manage personal info & address
+            </div>
           </div>
         </Button>
       </div>
@@ -331,27 +333,16 @@ export default function UserDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex justify-center">
               <Button
                 variant="ghost"
-                className="h-20 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center justify-center p-4"
+                className="h-20 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center justify-center p-4 w-64"
                 onClick={() => router.push("/dashboard/user/profile")}
               >
                 <User className="h-8 w-8 mb-2 text-lavender-300" />
-                <span className="font-medium">Personal Information</span>
+                <span className="font-medium">Edit Profile</span>
                 <span className="text-xs text-lavender-300">
-                  Name, email, phone
-                </span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="h-20 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center justify-center p-4"
-                onClick={() => router.push("/dashboard/user/addresses")}
-              >
-                <MapPin className="h-8 w-8 mb-2 text-lavender-300" />
-                <span className="font-medium">Shipping Addresses</span>
-                <span className="text-xs text-lavender-300">
-                  Manage delivery locations
+                  Update personal info & address
                 </span>
               </Button>
             </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -6,16 +7,12 @@ import { motion } from "framer-motion";
 import { Loading } from "@/components/ui/loading";
 import {
   Search,
-  Filter,
   Eye,
-  Edit,
   Trash2,
   UserCheck,
   UserX,
   Shield,
   User as UserIcon,
-  Calendar,
-  Mail,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
