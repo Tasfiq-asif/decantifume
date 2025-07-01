@@ -225,12 +225,42 @@ export const fetchTopProducts = createAsyncThunk(
 export const fetchAllUsers = createAsyncThunk(
   "admin/fetchAllUsers",
   async (
-    params: { page?: number; limit?: number } = {},
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: string;
+      isActive?: boolean;
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    } = {},
     { rejectWithValue }
   ) => {
     try {
-      const { page = 1, limit = 10 } = params;
-      const response = await api.get(`/users?page=${page}&limit=${limit}`);
+      const {
+        page = 1,
+        limit = 10,
+        search,
+        role,
+        isActive,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = params;
+
+      // Build query string
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        sortBy,
+        sortOrder,
+      });
+
+      if (search) queryParams.append("search", search);
+      if (role) queryParams.append("role", role);
+      if (typeof isActive === "boolean")
+        queryParams.append("isActive", isActive.toString());
+
+      const response = await api.get(`/users?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleApiError(error));
@@ -241,16 +271,47 @@ export const fetchAllUsers = createAsyncThunk(
 export const fetchAllOrders = createAsyncThunk(
   "admin/fetchAllOrders",
   async (
-    params: { page?: number; limit?: number; status?: string } = {},
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      orderStatus?: string;
+      paymentStatus?: string;
+      startDate?: string;
+      endDate?: string;
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    } = {},
     { rejectWithValue }
   ) => {
     try {
-      const { page = 1, limit = 10, status } = params;
-      let url = `/orders?page=${page}&limit=${limit}&sortBy=createdAt&sortOrder=desc`;
-      if (status) {
-        url += `&orderStatus=${status}`;
-      }
-      const response = await api.get(url);
+      const {
+        page = 1,
+        limit = 10,
+        search,
+        orderStatus,
+        paymentStatus,
+        startDate,
+        endDate,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = params;
+
+      // Build query string
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        sortBy,
+        sortOrder,
+      });
+
+      if (search) queryParams.append("search", search);
+      if (orderStatus) queryParams.append("orderStatus", orderStatus);
+      if (paymentStatus) queryParams.append("paymentStatus", paymentStatus);
+      if (startDate) queryParams.append("startDate", startDate);
+      if (endDate) queryParams.append("endDate", endDate);
+
+      const response = await api.get(`/orders?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleApiError(error));
@@ -269,6 +330,35 @@ export const updateUserStatus = createAsyncThunk(
         isActive: params.isActive,
       });
       return response.data.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
+
+export const updateUserRole = createAsyncThunk(
+  "admin/updateUserRole",
+  async (
+    params: { userId: string; role: "user" | "admin" },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await api.patch(`/users/${params.userId}/role`, {
+        role: params.role,
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "admin/deleteUser",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/users/${userId}`);
+      return { userId, ...response.data.data };
     } catch (error) {
       return rejectWithValue(handleApiError(error));
     }
@@ -411,6 +501,24 @@ const adminSlice = createSlice({
       if (index !== -1) {
         state.users[index] = updatedUser;
       }
+    });
+
+    // Update User Role
+    builder.addCase(updateUserRole.fulfilled, (state, action) => {
+      const updatedUser = action.payload;
+      const index = state.users.findIndex(
+        (user) => user._id === updatedUser._id
+      );
+      if (index !== -1) {
+        state.users[index] = updatedUser;
+      }
+    });
+
+    // Delete User
+    builder.addCase(deleteUser.fulfilled, (state, action) => {
+      state.users = state.users.filter(
+        (user) => user._id !== action.payload.userId
+      );
     });
 
     // Update Order Status
