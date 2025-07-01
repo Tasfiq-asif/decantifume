@@ -11,7 +11,6 @@ import {
   Package,
   ShoppingCart,
   BarChart3,
-  Settings,
   User,
   Heart,
   MapPin,
@@ -57,11 +56,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       href: "/dashboard/admin/analytics",
       label: "Analytics",
       icon: BarChart3,
-    },
-    {
-      href: "/dashboard/admin/settings",
-      label: "Settings",
-      icon: Settings,
     },
   ];
 
