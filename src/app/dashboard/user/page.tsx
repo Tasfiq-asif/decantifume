@@ -7,46 +7,121 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  User,
-  ShoppingBag,
-  Heart,
-  MapPin,
-  Settings,
-  Package,
-  CreditCard,
-  Star,
-} from "lucide-react";
+import { User, ShoppingBag, MapPin, Settings, Package } from "lucide-react";
+import { Loading } from "@/components/ui/loading";
 
 interface UserDashboardData {
   totalOrders: number;
   pendingOrders: number;
-  wishlistCount: number;
   recentOrders: Array<{
     id: string;
     productName: string;
     amount: number;
     status: string;
     date: string;
-    image?: string;
-  }>;
-  wishlistItems: Array<{
-    id: string;
-    name: string;
-    price: number;
-    image?: string;
   }>;
 }
 
+interface OrderFromAPI {
+  orderNumber: string;
+  items: Array<{
+    productName: string;
+  }>;
+  totalAmount: number;
+  orderStatus: string;
+  createdAt: string;
+}
+
+// API calls to get order statistics and recent orders
+const getUserOrderStats = async () => {
+  try {
+    const authToken = await getAuthToken();
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+
+    // Get order statistics
+    const statsResponse = await fetch(`${apiUrl}/orders/stats`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    // Get recent orders
+    const ordersResponse = await fetch(
+      `${apiUrl}/orders/my-orders?limit=5&sortBy=createdAt&sortOrder=desc`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+
+    if (!statsResponse.ok || !ordersResponse.ok) {
+      throw new Error("Failed to fetch order data");
+    }
+
+    const statsData = await statsResponse.json();
+    const ordersData = await ordersResponse.json();
+
+    // Combine the data
+    return {
+      totalOrders: statsData.data?.totalOrders || 0,
+      pendingOrders:
+        (statsData.data?.pendingOrders || 0) +
+        (statsData.data?.confirmedOrders || 0) +
+        (statsData.data?.processingOrders || 0),
+      recentOrders:
+        ordersData.data?.map((order: OrderFromAPI) => ({
+          id: order.orderNumber,
+          productName:
+            order.items?.length > 1
+              ? `${order.items[0]?.productName} +${order.items.length - 1} more`
+              : order.items[0]?.productName || "Order Items",
+          amount: order.totalAmount,
+          status: order.orderStatus,
+          date: new Date(order.createdAt).toLocaleDateString(),
+        })) || [],
+    };
+  } catch (error) {
+    console.error("Error fetching order data:", error);
+    // Return default data if API fails
+    return {
+      totalOrders: 0,
+      pendingOrders: 0,
+      recentOrders: [],
+    };
+  }
+};
+
+// Helper function to get auth token
+const getAuthToken = async () => {
+  if (typeof window !== "undefined") {
+    const { getSession } = await import("next-auth/react");
+    const session = await getSession();
+    return session?.accessToken || "";
+  }
+  return "";
+};
+
 export default function UserDashboard() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<UserDashboardData | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -57,49 +132,41 @@ export default function UserDashboard() {
       return;
     }
 
-    // Mock data - replace with actual API calls
-    setTimeout(() => {
-      setDashboardData({
-        totalOrders: 12,
-        pendingOrders: 2,
-        wishlistCount: 5,
-        recentOrders: [
-          {
-            id: "ORD001",
-            productName: "Premium Cologne Set",
-            amount: 129.99,
-            status: "delivered",
-            date: "2024-01-10",
-          },
-          {
-            id: "ORD002",
-            productName: "Luxury Perfume",
-            amount: 89.5,
-            status: "shipping",
-            date: "2024-01-12",
-          },
-          {
-            id: "ORD003",
-            productName: "Travel Size Collection",
-            amount: 45.0,
-            status: "processing",
-            date: "2024-01-14",
-          },
-        ],
-        wishlistItems: [
-          { id: "WISH001", name: "Rose Garden Perfume", price: 95.0 },
-          { id: "WISH002", name: "Ocean Breeze Cologne", price: 75.0 },
-          { id: "WISH003", name: "Midnight Essence", price: 120.0 },
-        ],
-      });
-      setLoading(false);
-    }, 1000);
-  }, [isAuthenticated, user, router]);
+    // Fetch order statistics
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getUserOrderStats();
+        setDashboardData(data);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError("Failed to load dashboard data. Please try again.");
+        // Set default data
+        setDashboardData({
+          totalOrders: 0,
+          pendingOrders: 0,
+          recentOrders: [],
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [isAuthenticated, user?.role, authLoading]);
 
   if (loading) {
+    return <Loading fullscreen message="Loading your dashboard..." />;
+  }
+
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lavender-600"></div>
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
       </div>
     );
   }
@@ -111,8 +178,10 @@ export default function UserDashboard() {
       case "delivered":
         return "bg-green-100 text-green-800";
       case "shipping":
+      case "shipped":
         return "bg-blue-100 text-blue-800";
       case "processing":
+      case "confirmed":
         return "bg-yellow-100 text-yellow-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
@@ -127,12 +196,12 @@ export default function UserDashboard() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white mb-2">My Dashboard</h1>
         <p className="text-lavender-200">
-          Welcome back, {user?.name}! Manage your account and orders.
+          Welcome back, {user?.name}! Manage your orders and profile.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
@@ -162,58 +231,34 @@ export default function UserDashboard() {
             <p className="text-xs text-lavender-300">Being processed</p>
           </CardContent>
         </Card>
-
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              Wishlist Items
-            </CardTitle>
-            <Heart className="h-4 w-4 text-lavender-300" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {dashboardData.wishlistCount}
-            </div>
-            <p className="text-xs text-lavender-300">Saved for later</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Button
-          onClick={() => router.push("/dashboard/user/profile")}
-          className="bg-lavender-600 hover:bg-lavender-700 text-white h-12"
-        >
-          <User className="h-4 w-4 mr-2" />
-          Edit Profile
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <Button
           onClick={() => router.push("/dashboard/user/orders")}
-          className="bg-dark-purple-600 hover:bg-dark-purple-700 text-white h-12"
+          className="bg-lavender-600 hover:bg-lavender-700 text-white h-16 text-lg"
         >
-          <ShoppingBag className="h-4 w-4 mr-2" />
-          My Orders
+          <ShoppingBag className="h-6 w-6 mr-3" />
+          <div className="text-left">
+            <div className="font-semibold">My Orders</div>
+            <div className="text-sm opacity-90">View and track orders</div>
+          </div>
         </Button>
         <Button
-          onClick={() => router.push("/dashboard/user/wishlist")}
-          className="bg-gold hover:bg-gold/90 text-dark-purple-900 h-12"
+          onClick={() => router.push("/dashboard/user/profile")}
+          className="bg-dark-purple-600 hover:bg-dark-purple-700 text-white h-16 text-lg"
         >
-          <Heart className="h-4 w-4 mr-2" />
-          Wishlist
-        </Button>
-        <Button
-          onClick={() => router.push("/dashboard/user/addresses")}
-          className="bg-white/20 hover:bg-white/30 text-white h-12 backdrop-blur-sm"
-        >
-          <MapPin className="h-4 w-4 mr-2" />
-          Addresses
+          <User className="h-6 w-6 mr-3" />
+          <div className="text-left">
+            <div className="font-semibold">Profile & Addresses</div>
+            <div className="text-sm opacity-90">Manage personal info</div>
+          </div>
         </Button>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Orders */}
+      {/* Recent Orders Section */}
+      <div className="mb-8">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
@@ -223,118 +268,91 @@ export default function UserDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboardData.recentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                >
-                  <div>
-                    <p className="text-white font-medium">
-                      {order.productName}
-                    </p>
-                    <p className="text-lavender-300 text-sm">
-                      Order #{order.id} • {order.date}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-white font-medium">${order.amount}</p>
-                    <Badge className={getStatusColor(order.status)}>
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="ghost"
-              className="w-full mt-4 text-lavender-300 hover:text-white hover:bg-white/10"
-              onClick={() => router.push("/dashboard/user/orders")}
-            >
-              View All Orders
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Wishlist */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Heart className="h-5 w-5 mr-2" />
-              My Wishlist
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.wishlistItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-lavender-600/20 rounded-lg flex items-center justify-center mr-3">
-                      <Star className="h-6 w-6 text-lavender-300" />
-                    </div>
+              {dashboardData.recentOrders.length > 0 ? (
+                dashboardData.recentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    onClick={() =>
+                      router.push(`/dashboard/user/orders/${order.id}`)
+                    }
+                  >
                     <div>
-                      <p className="text-white font-medium">{item.name}</p>
+                      <p className="text-white font-medium">
+                        {order.productName}
+                      </p>
                       <p className="text-lavender-300 text-sm">
-                        ${item.price.toFixed(2)}
+                        Order #{order.id} • {order.date}
                       </p>
                     </div>
+                    <div className="text-right">
+                      <p className="text-white font-medium">${order.amount}</p>
+                      <Badge className={getStatusColor(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Package className="h-12 w-12 text-lavender-300 mx-auto mb-4" />
+                  <p className="text-lavender-300 mb-4">
+                    No orders yet. Start shopping to see your orders here!
+                  </p>
                   <Button
-                    size="sm"
+                    onClick={() => router.push("/products")}
                     className="bg-lavender-600 hover:bg-lavender-700 text-white"
                   >
-                    Add to Cart
+                    Browse Products
                   </Button>
                 </div>
-              ))}
+              )}
             </div>
-            <Button
-              variant="ghost"
-              className="w-full mt-4 text-lavender-300 hover:text-white hover:bg-white/10"
-              onClick={() => router.push("/dashboard/user/wishlist")}
-            >
-              View Full Wishlist
-            </Button>
+            {dashboardData.recentOrders.length > 0 && (
+              <Button
+                variant="ghost"
+                className="w-full mt-4 text-lavender-300 hover:text-white hover:bg-white/10"
+                onClick={() => router.push("/dashboard/user/orders")}
+              >
+                View All Orders
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Account Settings Section */}
-      <div className="mt-8">
+      {/* Profile Management Section */}
+      <div className="mb-8">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Settings className="h-5 w-5 mr-2" />
-              Account Settings
+              Account Management
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Button
                 variant="ghost"
-                className="h-16 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center"
+                className="h-20 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center justify-center p-4"
                 onClick={() => router.push("/dashboard/user/profile")}
               >
-                <User className="h-6 w-6 mb-1" />
-                <span className="text-sm">Profile Settings</span>
+                <User className="h-8 w-8 mb-2 text-lavender-300" />
+                <span className="font-medium">Personal Information</span>
+                <span className="text-xs text-lavender-300">
+                  Name, email, phone
+                </span>
               </Button>
               <Button
                 variant="ghost"
-                className="h-16 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center"
-                onClick={() => router.push("/dashboard/user/payment")}
-              >
-                <CreditCard className="h-6 w-6 mb-1" />
-                <span className="text-sm">Payment Methods</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="h-16 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center"
+                className="h-20 bg-white/5 hover:bg-white/10 text-white flex flex-col items-center justify-center p-4"
                 onClick={() => router.push("/dashboard/user/addresses")}
               >
-                <MapPin className="h-6 w-6 mb-1" />
-                <span className="text-sm">Manage Addresses</span>
+                <MapPin className="h-8 w-8 mb-2 text-lavender-300" />
+                <span className="font-medium">Shipping Addresses</span>
+                <span className="text-xs text-lavender-300">
+                  Manage delivery locations
+                </span>
               </Button>
             </div>
           </CardContent>

@@ -16,6 +16,7 @@ import {
   Download,
   RefreshCw,
 } from "lucide-react";
+import { Loading } from "@/components/ui/loading";
 
 interface OrderItem {
   id: string;
@@ -194,11 +195,7 @@ export default function UserOrders() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lavender-600"></div>
-      </div>
-    );
+    return <Loading fullscreen message="Loading your orders..." />;
   }
 
   return (
