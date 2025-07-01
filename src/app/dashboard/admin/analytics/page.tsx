@@ -33,7 +33,9 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
   Activity,
+  ChevronDown,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 
 // Redux imports
 import { useSelector, useDispatch } from "react-redux";
@@ -101,7 +103,9 @@ export default function AnalyticsPage() {
 
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("12months");
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const hasLoadedData = useRef(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
 
   // Generate analytics data
   const revenueData = generateRevenueData();
@@ -155,6 +159,26 @@ export default function AnalyticsPage() {
     loadAnalyticsData();
   }, [isAuthenticated, user?.role, router, loadAnalyticsData]);
 
+  // Handle click outside export menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        exportMenuRef.current &&
+        !exportMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowExportMenu(false);
+      }
+    };
+
+    if (showExportMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showExportMenu]);
+
   if (loading || user === null) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800">
@@ -191,11 +215,118 @@ export default function AnalyticsPage() {
   const customersChange = 12.1;
   const avgOrderChange = -2.4;
 
+  // Export functions
+  const exportToCSV = (
+    data: Record<string, string | number>[],
+    filename: string
+  ) => {
+    const csvContent = [
+      Object.keys(data[0]).join(","),
+      ...data.map((row) => Object.values(row).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${filename}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToExcel = (
+    data: Record<string, string | number>[],
+    filename: string
+  ) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Analytics Data");
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+  };
+
+  const handleExportAll = (format: "csv" | "excel") => {
+    // Combine all analytics data into comprehensive export
+    const allData = [
+      // Summary Stats
+      {
+        Type: "SUMMARY",
+        Metric: "Total Revenue",
+        Value: stats?.totalRevenue || 0,
+        Change: `+${revenueChange}%`,
+      },
+      {
+        Type: "SUMMARY",
+        Metric: "Total Orders",
+        Value: stats?.totalOrders || 0,
+        Change: `+${ordersChange}%`,
+      },
+      {
+        Type: "SUMMARY",
+        Metric: "Total Customers",
+        Value: userStats?.totalUsers || 0,
+        Change: `+${customersChange}%`,
+      },
+      {
+        Type: "SUMMARY",
+        Metric: "Average Order Value",
+        Value: stats?.averageOrderValue || 0,
+        Change: `${avgOrderChange}%`,
+      },
+
+      // Spacer
+      { Type: "", Metric: "", Value: "", Change: "" },
+
+      // Top Products
+      {
+        Type: "TOP PRODUCTS",
+        Metric: "Rank",
+        Value: "Product Name",
+        Change: "Revenue",
+      },
+      ...topProducts.slice(0, 5).map((product, index) => ({
+        Type: "PRODUCT",
+        Metric: index + 1,
+        Value: `${product.name} (${product.brand})`,
+        Change: product.revenue,
+      })),
+
+      // Spacer
+      { Type: "", Metric: "", Value: "", Change: "" },
+
+      // Recent Orders
+      {
+        Type: "RECENT ORDERS",
+        Metric: "Order ID",
+        Value: "Customer",
+        Change: "Amount",
+      },
+      ...recentOrders.slice(0, 5).map((order) => ({
+        Type: "ORDER",
+        Metric: order.id,
+        Value: order.customerName,
+        Change: order.amount,
+      })),
+    ];
+
+    const filename = `analytics-report-${
+      new Date().toISOString().split("T")[0]
+    }`;
+
+    if (format === "csv") {
+      exportToCSV(allData, filename);
+    } else {
+      exportToExcel(allData, filename);
+    }
+    setShowExportMenu(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 relative z-10">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">
@@ -216,10 +347,34 @@ export default function AnalyticsPage() {
                 <option value="12months">Last 12 months</option>
                 <option value="1year">This year</option>
               </select>
-              <Button className="bg-lavender-600 hover:bg-lavender-700 text-white">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+              <div className="relative" ref={exportMenuRef}>
+                <Button
+                  className="bg-lavender-600 hover:bg-lavender-700 text-white"
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                </Button>
+                {showExportMenu && (
+                  <div className="absolute right-0 mt-2 w-40 bg-dark-purple-800 border border-lavender-600/30 rounded-lg shadow-lg z-[9999]">
+                    <div className="p-2">
+                      <button
+                        onClick={() => handleExportAll("csv")}
+                        className="w-full text-left px-3 py-2 text-white hover:bg-lavender-600/20 rounded flex items-center"
+                      >
+                        📄 Export CSV
+                      </button>
+                      <button
+                        onClick={() => handleExportAll("excel")}
+                        className="w-full text-left px-3 py-2 text-white hover:bg-lavender-600/20 rounded flex items-center"
+                      >
+                        📊 Export Excel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
