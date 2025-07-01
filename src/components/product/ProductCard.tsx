@@ -3,7 +3,7 @@
 import { useState, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Heart, Check } from "lucide-react";
+import { ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -132,7 +132,7 @@ export const ProductCard = memo(function ProductCard({
                 size="sm"
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="flex-1 bg-primary hover:bg-primary/90 text-white border-0 h-9 font-medium"
+                className="w-full bg-primary hover:bg-primary/90 text-white border-0 h-9 font-medium"
               >
                 {isAdding ? (
                   <>
@@ -145,14 +145,6 @@ export const ProductCard = memo(function ProductCard({
                     Add to Cart
                   </>
                 )}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-white hover:bg-gray-100 text-black border-0 h-9"
-              >
-                <Heart className="h-4 w-4" />
-                <span className="sr-only">Add to Wishlist</span>
               </Button>
             </div>
           </div>

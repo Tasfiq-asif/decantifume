@@ -12,9 +12,6 @@ import {
   ShoppingCart,
   BarChart3,
   User,
-  Heart,
-  MapPin,
-  CreditCard,
   LogOut,
   Home,
 } from "lucide-react";
@@ -72,24 +69,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: ShoppingCart,
     },
     {
-      href: "/dashboard/user/wishlist",
-      label: "Wishlist",
-      icon: Heart,
-    },
-    {
       href: "/dashboard/user/profile",
       label: "Profile",
       icon: User,
-    },
-    {
-      href: "/dashboard/user/addresses",
-      label: "Addresses",
-      icon: MapPin,
-    },
-    {
-      href: "/dashboard/user/payment",
-      label: "Payment Methods",
-      icon: CreditCard,
     },
   ];
 

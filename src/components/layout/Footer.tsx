@@ -162,14 +162,6 @@ export function Footer() {
                   Order History
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/wishlist"
-                  className="text-sm text-muted-foreground hover:text-primary"
-                >
-                  Wishlist
-                </Link>
-              </li>
             </ul>
           </div>
         </div>

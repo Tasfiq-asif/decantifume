@@ -147,16 +147,7 @@ export function Navbar() {
                       My Orders
                     </button>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <button
-                      onClick={() =>
-                        handleNavigation("/dashboard/user/wishlist", "Wishlist")
-                      }
-                      className="w-full text-left"
-                    >
-                      Wishlist
-                    </button>
-                  </DropdownMenuItem>
+
                   <DropdownMenuItem asChild>
                     <button onClick={handleLogout} className="w-full text-left">
                       Sign Out
