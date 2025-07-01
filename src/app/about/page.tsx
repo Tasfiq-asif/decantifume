@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { usePageLoading } from "@/lib/hooks/usePageLoading";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,14 +60,10 @@ export default function AboutPage() {
         {/* Hero Section */}
         <div className="relative h-[70vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/dior-sauvage.jpg"
-              alt="Luxury Perfume Collection"
-              fill
-              className="object-cover opacity-30"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-dark-purple-900/80 via-dark-purple-800/60 to-dark-purple-900/80" />
+            <div className="absolute inset-0 bg-gradient-to-br from-lavender-900/60 via-dark-purple-800/80 to-dark-purple-900/90" />
+            <div className="absolute top-10 left-10 w-64 h-64 bg-gradient-to-br from-lavender-500/20 to-purple-600/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-purple-500/15 to-lavender-600/15 rounded-full blur-3xl animate-pulse delay-1000" />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-lavender-400/10 to-purple-700/10 rounded-full blur-3xl animate-pulse delay-500" />
           </div>
 
           <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
@@ -112,20 +107,16 @@ export default function AboutPage() {
               </div>
               <div className="relative">
                 <div className="grid grid-cols-2 gap-4">
-                  <Image
-                    src="/images/creed-aventus.jpg"
-                    alt="Creed Aventus"
-                    width={200}
-                    height={300}
-                    className="rounded-lg shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
-                  />
-                  <Image
-                    src="/images/YSL-Libre.jpg"
-                    alt="YSL Libre"
-                    width={200}
-                    height={300}
-                    className="rounded-lg shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8"
-                  />
+                  <div className="h-64 bg-gradient-to-br from-lavender-600/30 via-purple-600/20 to-dark-purple-800/40 rounded-lg shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300 backdrop-blur-sm border border-lavender-400/20">
+                    <div className="h-full w-full bg-gradient-to-br from-lavender-400/10 to-purple-700/20 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-lavender-500/30 rounded-full blur-xl"></div>
+                    </div>
+                  </div>
+                  <div className="h-64 bg-gradient-to-br from-purple-600/30 via-lavender-500/20 to-dark-purple-700/40 rounded-lg shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300 backdrop-blur-sm border border-purple-400/20 mt-8">
+                    <div className="h-full w-full bg-gradient-to-br from-purple-400/10 to-lavender-600/20 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-purple-500/30 rounded-full blur-xl"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -134,20 +125,16 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
               <div className="order-2 md:order-1 relative">
                 <div className="grid grid-cols-2 gap-4">
-                  <Image
-                    src="/images/blue-de-chanel.jpg"
-                    alt="Blue de Chanel"
-                    width={200}
-                    height={300}
-                    className="rounded-lg shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-300"
-                  />
-                  <Image
-                    src="/images/Lancome-La-Vie-Est-Belle-Rose-Extraordinaire-100ml.webp"
-                    alt="Lancome La Vie Est Belle"
-                    width={200}
-                    height={300}
-                    className="rounded-lg shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300 mt-6"
-                  />
+                  <div className="h-64 bg-gradient-to-br from-dark-purple-700/40 via-lavender-600/30 to-purple-800/30 rounded-lg shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-300 backdrop-blur-sm border border-dark-purple-400/20">
+                    <div className="h-full w-full bg-gradient-to-br from-dark-purple-500/10 to-lavender-500/20 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-dark-purple-400/30 rounded-full blur-xl"></div>
+                    </div>
+                  </div>
+                  <div className="h-64 bg-gradient-to-br from-lavender-700/40 via-purple-500/30 to-dark-purple-600/40 rounded-lg shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300 backdrop-blur-sm border border-lavender-500/20 mt-6">
+                    <div className="h-full w-full bg-gradient-to-br from-lavender-500/10 to-purple-600/20 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-lavender-400/30 rounded-full blur-xl"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="order-1 md:order-2 space-y-6">
@@ -216,7 +203,7 @@ export default function AboutPage() {
                       className="bg-gradient-to-b from-dark-purple-900/50 to-dark-purple-800/50 border border-lavender-400/20 backdrop-blur-sm hover:border-lavender-400/40 transition-colors duration-300"
                     >
                       <CardContent className="p-6 text-center">
-                        <div className="w-12 h-12 bg-lavender-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-lavender-600/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Icon className="h-6 w-6 text-lavender-300" />
                         </div>
                         <h3 className="text-xl font-semibold text-lavender-100 mb-3">
@@ -234,8 +221,13 @@ export default function AboutPage() {
 
             {/* Values Section */}
             <div className="text-center">
-              <Card className="bg-gradient-to-br from-lavender-900/20 via-dark-purple-900/30 to-lavender-800/20 border border-lavender-400/30 backdrop-blur-sm">
-                <CardContent className="p-12">
+              <Card className="bg-gradient-to-br from-lavender-900/20 via-dark-purple-900/30 to-lavender-800/20 border border-lavender-400/30 backdrop-blur-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full">
+                  <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-lavender-500/10 to-purple-600/10 rounded-full blur-2xl" />
+                  <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-lavender-600/10 rounded-full blur-2xl" />
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-lavender-400/5 to-purple-700/5 rounded-full blur-3xl" />
+                </div>
+                <CardContent className="p-12 relative z-10">
                   <h2 className="text-4xl font-bold text-lavender-100 mb-6">
                     Our Promise
                   </h2>
@@ -246,16 +238,16 @@ export default function AboutPage() {
                     finding your perfect scent.
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">
-                    <Badge className="bg-lavender-600 text-white px-4 py-2 text-sm">
+                    <Badge className="bg-gradient-to-r from-lavender-600 to-purple-600 text-white px-4 py-2 text-sm border-0">
                       🌟 Premium Quality
                     </Badge>
-                    <Badge className="bg-lavender-600 text-white px-4 py-2 text-sm">
+                    <Badge className="bg-gradient-to-r from-purple-600 to-lavender-600 text-white px-4 py-2 text-sm border-0">
                       🔒 100% Authentic
                     </Badge>
-                    <Badge className="bg-lavender-600 text-white px-4 py-2 text-sm">
+                    <Badge className="bg-gradient-to-r from-lavender-500 to-purple-700 text-white px-4 py-2 text-sm border-0">
                       ⚡ Fast Shipping
                     </Badge>
-                    <Badge className="bg-lavender-600 text-white px-4 py-2 text-sm">
+                    <Badge className="bg-gradient-to-r from-purple-700 to-lavender-500 text-white px-4 py-2 text-sm border-0">
                       💜 Made with Love
                     </Badge>
                   </div>
