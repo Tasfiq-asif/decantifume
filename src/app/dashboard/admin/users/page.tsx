@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import { Loading } from "@/components/ui/loading";
 import {
   Search,
   Filter,
@@ -126,14 +127,7 @@ const AdminUsersPage = () => {
   };
 
   if (usersLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-lavender-300 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading users...</p>
-        </div>
-      </div>
-    );
+    return <Loading fullscreen message="Loading users..." />;
   }
 
   if (usersError) {
@@ -158,7 +152,9 @@ const AdminUsersPage = () => {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
-          <h1 className="text-3xl font-bold text-white mb-2">User Management</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            User Management
+          </h1>
           <p className="text-lavender-200">
             Manage user accounts, roles, and permissions
           </p>
@@ -186,9 +182,15 @@ const AdminUsersPage = () => {
                 onChange={(e) => setSelectedRole(e.target.value)}
                 className="w-full px-4 py-2 bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none"
               >
-                <option value="" className="bg-dark-purple-800">All Roles</option>
-                <option value="user" className="bg-dark-purple-800">User</option>
-                <option value="admin" className="bg-dark-purple-800">Admin</option>
+                <option value="" className="bg-dark-purple-800">
+                  All Roles
+                </option>
+                <option value="user" className="bg-dark-purple-800">
+                  User
+                </option>
+                <option value="admin" className="bg-dark-purple-800">
+                  Admin
+                </option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lavender-300 h-4 w-4 pointer-events-none" />
             </div>
@@ -200,9 +202,15 @@ const AdminUsersPage = () => {
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="w-full px-4 py-2 bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none"
               >
-                <option value="" className="bg-dark-purple-800">All Status</option>
-                <option value="active" className="bg-dark-purple-800">Active</option>
-                <option value="inactive" className="bg-dark-purple-800">Inactive</option>
+                <option value="" className="bg-dark-purple-800">
+                  All Status
+                </option>
+                <option value="active" className="bg-dark-purple-800">
+                  Active
+                </option>
+                <option value="inactive" className="bg-dark-purple-800">
+                  Inactive
+                </option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lavender-300 h-4 w-4 pointer-events-none" />
             </div>
@@ -214,10 +222,18 @@ const AdminUsersPage = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full px-4 py-2 bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none"
               >
-                <option value="createdAt" className="bg-dark-purple-800">Date Created</option>
-                <option value="name" className="bg-dark-purple-800">Name</option>
-                <option value="email" className="bg-dark-purple-800">Email</option>
-                <option value="role" className="bg-dark-purple-800">Role</option>
+                <option value="createdAt" className="bg-dark-purple-800">
+                  Date Created
+                </option>
+                <option value="name" className="bg-dark-purple-800">
+                  Name
+                </option>
+                <option value="email" className="bg-dark-purple-800">
+                  Email
+                </option>
+                <option value="role" className="bg-dark-purple-800">
+                  Role
+                </option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lavender-300 h-4 w-4 pointer-events-none" />
             </div>
@@ -229,8 +245,12 @@ const AdminUsersPage = () => {
                 onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
                 className="w-full px-4 py-2 bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none"
               >
-                <option value="desc" className="bg-dark-purple-800">Newest First</option>
-                <option value="asc" className="bg-dark-purple-800">Oldest First</option>
+                <option value="desc" className="bg-dark-purple-800">
+                  Newest First
+                </option>
+                <option value="asc" className="bg-dark-purple-800">
+                  Oldest First
+                </option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lavender-300 h-4 w-4 pointer-events-none" />
             </div>
@@ -290,12 +310,19 @@ const AdminUsersPage = () => {
                         <select
                           value={user.role}
                           onChange={(e) =>
-                            handleRoleUpdate(user._id, e.target.value as "user" | "admin")
+                            handleRoleUpdate(
+                              user._id,
+                              e.target.value as "user" | "admin"
+                            )
                           }
                           className="bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none pr-8"
                         >
-                          <option value="user" className="bg-dark-purple-800">User</option>
-                          <option value="admin" className="bg-dark-purple-800">Admin</option>
+                          <option value="user" className="bg-dark-purple-800">
+                            User
+                          </option>
+                          <option value="admin" className="bg-dark-purple-800">
+                            Admin
+                          </option>
                         </select>
                         <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-lavender-300 h-3 w-3 pointer-events-none" />
                       </div>
@@ -305,12 +332,22 @@ const AdminUsersPage = () => {
                         <select
                           value={user.isActive ? "active" : "inactive"}
                           onChange={(e) =>
-                            handleStatusUpdate(user._id, e.target.value === "active")
+                            handleStatusUpdate(
+                              user._id,
+                              e.target.value === "active"
+                            )
                           }
                           className="bg-dark-purple-800/50 border border-lavender-600/30 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-lavender-500 appearance-none pr-8"
                         >
-                          <option value="active" className="bg-dark-purple-800">Active</option>
-                          <option value="inactive" className="bg-dark-purple-800">Inactive</option>
+                          <option value="active" className="bg-dark-purple-800">
+                            Active
+                          </option>
+                          <option
+                            value="inactive"
+                            className="bg-dark-purple-800"
+                          >
+                            Inactive
+                          </option>
                         </select>
                         <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-lavender-300 h-3 w-3 pointer-events-none" />
                       </div>
@@ -352,7 +389,8 @@ const AdminUsersPage = () => {
           <div className="bg-dark-purple-800/30 px-6 py-4 border-t border-white/10">
             <div className="flex items-center justify-between">
               <div className="text-sm text-lavender-200">
-                Showing {(usersPagination.page - 1) * usersPagination.limit + 1} to{" "}
+                Showing {(usersPagination.page - 1) * usersPagination.limit + 1}{" "}
+                to{" "}
                 {Math.min(
                   usersPagination.page * usersPagination.limit,
                   usersPagination.total
@@ -361,7 +399,9 @@ const AdminUsersPage = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => dispatch(setUsersPage(usersPagination.page - 1))}
+                  onClick={() =>
+                    dispatch(setUsersPage(usersPagination.page - 1))
+                  }
                   disabled={usersPagination.page <= 1}
                   className="p-2 bg-lavender-600/20 hover:bg-lavender-600/30 disabled:opacity-50 disabled:cursor-not-allowed text-lavender-300 rounded-lg transition-colors"
                 >
@@ -371,7 +411,9 @@ const AdminUsersPage = () => {
                   Page {usersPagination.page} of {usersPagination.totalPages}
                 </span>
                 <button
-                  onClick={() => dispatch(setUsersPage(usersPagination.page + 1))}
+                  onClick={() =>
+                    dispatch(setUsersPage(usersPagination.page + 1))
+                  }
                   disabled={usersPagination.page >= usersPagination.totalPages}
                   className="p-2 bg-lavender-600/20 hover:bg-lavender-600/30 disabled:opacity-50 disabled:cursor-not-allowed text-lavender-300 rounded-lg transition-colors"
                 >
@@ -411,13 +453,17 @@ const AdminUsersPage = () => {
                       <label className="text-lavender-300 text-sm font-medium">
                         Name
                       </label>
-                      <p className="text-white font-medium">{selectedUser.name}</p>
+                      <p className="text-white font-medium">
+                        {selectedUser.name}
+                      </p>
                     </div>
                     <div>
                       <label className="text-lavender-300 text-sm font-medium">
                         Email
                       </label>
-                      <p className="text-white font-medium">{selectedUser.email}</p>
+                      <p className="text-white font-medium">
+                        {selectedUser.email}
+                      </p>
                     </div>
                     <div>
                       <label className="text-lavender-300 text-sm font-medium">
@@ -476,7 +522,10 @@ const AdminUsersPage = () => {
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() =>
-                        handleStatusUpdate(selectedUser._id, !selectedUser.isActive)
+                        handleStatusUpdate(
+                          selectedUser._id,
+                          !selectedUser.isActive
+                        )
                       }
                       className={`px-4 py-2 rounded-lg transition-colors ${
                         selectedUser.isActive
@@ -484,7 +533,9 @@ const AdminUsersPage = () => {
                           : "bg-green-600/20 hover:bg-green-600/30 text-green-300"
                       }`}
                     >
-                      {selectedUser.isActive ? "Deactivate User" : "Activate User"}
+                      {selectedUser.isActive
+                        ? "Deactivate User"
+                        : "Activate User"}
                     </button>
                     <button
                       onClick={() =>

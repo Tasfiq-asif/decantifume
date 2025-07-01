@@ -16,6 +16,7 @@ import {
   Plus,
   BarChart3,
 } from "lucide-react";
+import { Loading } from "@/components/ui/loading";
 
 // Redux imports
 import { useSelector, useDispatch } from "react-redux";
@@ -144,14 +145,7 @@ export default function AdminDashboard() {
 
   // Simplified loading condition - only check local loading state
   if (loading || user === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lavender-600 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading Admin Dashboard...</p>
-        </div>
-      </div>
-    );
+    return <Loading fullscreen message="Loading Admin Dashboard..." />;
   }
 
   // Show error state with more specific messaging
@@ -210,14 +204,7 @@ export default function AdminDashboard() {
 
   // Early return if stats are not loaded yet
   if (!stats) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-dark-purple-900 via-lavender-900 to-dark-purple-800">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lavender-600 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading Admin Dashboard...</p>
-        </div>
-      </div>
-    );
+    return <Loading fullscreen message="Loading dashboard data..." />;
   }
 
   const getStatusColor = (status: string) => {
