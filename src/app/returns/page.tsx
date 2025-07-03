@@ -15,8 +15,8 @@ export default function ReturnsPage() {
             <CardContent className="space-y-4">
               <p>
                 We want you to be completely satisfied with your purchase. If
-                you're not happy with your order, we offer a hassle-free return
-                policy.
+                you&apos;re not happy with your order, we offer a hassle-free
+                return policy.
               </p>
 
               <div className="space-y-2">
@@ -41,9 +41,9 @@ export default function ReturnsPage() {
               <div className="space-y-2">
                 <h3 className="font-semibold">Refund Process</h3>
                 <p>
-                  Once we receive and inspect your returned item, we'll process
-                  your refund within 3-5 business days. Refunds will be issued
-                  to the original payment method.
+                  Once we receive and inspect your returned item, we&apos;ll
+                  process your refund within 3-5 business days. Refunds will be
+                  issued to the original payment method.
                 </p>
               </div>
 
