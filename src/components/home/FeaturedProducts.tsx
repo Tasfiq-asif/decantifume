@@ -196,7 +196,7 @@ export function FeaturedProducts() {
             whileTap={{ scale: 0.95 }}
           >
             <Button variant="outline" className="mt-4 md:mt-0" asChild>
-              <Link href="/shop">View All Products</Link>
+              <Link href="/products">View All Products</Link>
             </Button>
           </motion.div>
         </motion.div>

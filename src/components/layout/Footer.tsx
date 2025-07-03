@@ -48,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/shop"
+                  href="/products"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   All Perfumes
@@ -56,7 +56,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collections/designer"
+                  href="/products"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   Designer
@@ -64,7 +64,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collections/niche"
+                  href="/products"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   Niche
@@ -72,7 +72,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collections/bestsellers"
+                  href="/products"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   Best Sellers
@@ -80,7 +80,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collections/new"
+                  href="/products"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   New Arrivals

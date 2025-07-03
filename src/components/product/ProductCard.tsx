@@ -2,7 +2,6 @@
 
 import { useState, memo } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -81,14 +80,12 @@ export const ProductCard = memo(function ProductCard({
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="relative aspect-square overflow-hidden">
-        <Link href={`/product/${product.id}`}>
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </Link>
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
@@ -155,14 +152,9 @@ export const ProductCard = memo(function ProductCard({
         <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
           {product.brand}
         </div>
-        <Link
-          href={`/product/${product.id}`}
-          className="block group-hover:text-primary transition-colors"
-        >
-          <h3 className="font-medium leading-tight mb-2 line-clamp-2">
-            {product.name}
-          </h3>
-        </Link>
+        <h3 className="font-medium leading-tight mb-2 line-clamp-2">
+          {product.name}
+        </h3>
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold">
             ${currentPrice.toFixed(2)}
