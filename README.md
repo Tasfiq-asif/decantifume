@@ -8,6 +8,11 @@ A modern, full-stack e-commerce platform built with **Next.js 15**, **Node.js**,
 ![MongoDB](https://img.shields.io/badge/MongoDB-7-green?style=for-the-badge&logo=mongodb)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-cyan?style=for-the-badge&logo=tailwind-css)
 
+## Live Demo
+
+Visit the live application: [Decantifume](https://decantifume.vercel.app/)
+
+
 ## 🌟 Features
 
 ### 🔐 **Authentication & Authorization**
