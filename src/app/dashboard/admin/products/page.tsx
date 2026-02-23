@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -509,9 +510,11 @@ const ProductFormDialog = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {formData.images.map((image, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={image}
                         alt={`Product ${index + 1}`}
+                        width={200}
+                        height={96}
                         className="w-full h-24 object-cover rounded-lg border border-gray-200"
                       />
                       <button

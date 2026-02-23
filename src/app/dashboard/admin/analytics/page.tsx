@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
     }
 
     loadAnalyticsData();
-  }, [isAuthenticated, user?.role, router, loadAnalyticsData]);
+  }, [isAuthenticated, user, router, loadAnalyticsData]);
 
   // Handle click outside export menu
   useEffect(() => {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { Loading } from "@/components/ui/loading";
@@ -46,13 +46,8 @@ const AdminUsersPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   // Fetch users with current filters
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     const params: any = {
       page: usersPagination.page,
       limit: usersPagination.limit,
@@ -65,7 +60,13 @@ const AdminUsersPage = () => {
     if (selectedStatus !== "") params.isActive = selectedStatus === "active";
 
     dispatch(fetchAllUsers(params));
-  };
+  }, [dispatch, usersPagination.page, usersPagination.limit, sortBy, sortOrder, searchTerm, selectedRole, selectedStatus]);
+
+  // Initial data fetch
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Re-fetch when filters change
   useEffect(() => {
@@ -75,9 +76,10 @@ const AdminUsersPage = () => {
     }, 500);
 
     return () => clearTimeout(delayedFetch);
-  }, [searchTerm, selectedRole, selectedStatus, sortBy, sortOrder]);
+  }, [searchTerm, selectedRole, selectedStatus, sortBy, sortOrder, dispatch, fetchUsers]);
 
-  // Fetch when page changes
+  // Fetch when page changes (eslint-disable to avoid re-running on filter changes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchUsers();
   }, [usersPagination.page]);

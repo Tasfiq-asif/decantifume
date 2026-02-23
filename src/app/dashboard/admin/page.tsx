@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       setLoading(false);
       isLoadingData.current = false;
     }
-  }, []); // Remove dispatch dependency to prevent recreation
+  }, [dispatch]);
 
   // Separate effect to handle authentication and data loading
   useEffect(() => {
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
         loadDashboardData();
       }, 100);
     }
-  }, [isAuthenticated, user?.role, router]); // Removed loadDashboardData dependency
+  }, [isAuthenticated, user, router, loadDashboardData]);
 
   // Manual retry function that resets all flags
   const handleRetry = useCallback(() => {
