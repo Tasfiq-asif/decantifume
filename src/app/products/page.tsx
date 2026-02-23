@@ -222,7 +222,8 @@ export default function ProductsPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Our Collection</h1>
+          <h1 className="text-4xl font-bold mb-2">Our Collection</h1>
+          <div className="w-16 h-1 bg-gradient-to-r from-[#c8a2ff] to-transparent rounded-full mb-3" />
           <p className="text-muted-foreground">
             Discover premium fragrances from the world&apos;s finest perfume
             houses
@@ -230,7 +231,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Search and Basic Filters */}
-        <Card className="mb-8">
+        <Card className="mb-8 glass-card border-[rgba(200,162,255,0.1)]">
           <CardContent className="p-6">
             {/* Search */}
             <div className="flex gap-2 mb-4">
@@ -483,12 +484,12 @@ export default function ProductsPage() {
           // OPTIMIZED: Reduced skeleton cards from 8 to 4 for faster perceived loading
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <div className="aspect-square bg-muted rounded-lg mb-4"></div>
+              <Card key={i} className="animate-pulse glass-card border-[rgba(200,162,255,0.08)]">
+                <div className="aspect-square bg-muted/50 rounded-t-xl"></div>
                 <CardContent className="p-4">
-                  <div className="h-4 bg-muted rounded mb-2"></div>
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-3 bg-muted/50 rounded mb-3 w-1/3"></div>
+                  <div className="h-4 bg-muted/50 rounded mb-2"></div>
+                  <div className="h-4 bg-muted/50 rounded w-1/2"></div>
                 </CardContent>
               </Card>
             ))}

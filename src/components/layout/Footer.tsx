@@ -9,8 +9,10 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-background border-t">
-      <div className="px-8 py-12 md:py-16 mx-auto">
+    <footer className="bg-background border-t border-transparent relative">
+      {/* Top gradient border */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c8a2ff]/30 to-transparent" />
+      <div className="px-8 py-12 md:py-16 mx-auto glass-card rounded-none border-x-0 border-b-0">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <h3 className="text-lg font-bold">DECANT</h3>
@@ -18,24 +20,24 @@ export function Footer() {
               Premium decant perfumes at affordable prices. Experience luxury
               scents without the full bottle commitment.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <Link
                 href="https://instagram.com"
-                className="text-muted-foreground hover:text-primary"
+                className="text-muted-foreground hover:text-[#1a1a2e] hover:bg-[#c8a2ff] p-2 rounded-full transition-all duration-200"
               >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link
                 href="https://facebook.com"
-                className="text-muted-foreground hover:text-primary"
+                className="text-muted-foreground hover:text-[#1a1a2e] hover:bg-[#c8a2ff] p-2 rounded-full transition-all duration-200"
               >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
               <Link
                 href="https://twitter.com"
-                className="text-muted-foreground hover:text-primary"
+                className="text-muted-foreground hover:text-[#1a1a2e] hover:bg-[#c8a2ff] p-2 rounded-full transition-all duration-200"
               >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>

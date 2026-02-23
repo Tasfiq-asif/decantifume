@@ -54,9 +54,12 @@ export const useAuth = () => {
       // Update the ref with current user
       previousUserIdRef.current = currentUserId;
     } else if (status === "unauthenticated") {
-      // Clear user state and cart on logout
+      // Clear user state on logout
       dispatch(clearUser());
-      dispatch(clearCart());
+      // Only clear cart if user was previously logged in (actual logout, not initial load)
+      if (previousUserIdRef.current) {
+        dispatch(clearCart());
+      }
       previousUserIdRef.current = null;
     }
   }, [session, status, dispatch]);

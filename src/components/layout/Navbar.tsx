@@ -75,16 +75,16 @@ export function Navbar() {
 
         <div className="mr-4 flex ">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold text-xl">DECANT</span>
+            <span className="font-bold text-xl bg-gradient-to-r from-[#c8a2ff] to-[#e6d9ff] bg-clip-text text-transparent">DECANT</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             {navigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavigation(item.href, item.name)}
-                className={`transition-colors hover:text-primary ${
+                className={`cursor-pointer relative transition-colors hover:text-primary pb-1 ${
                   pathname === item.href
-                    ? "text-primary"
+                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full"
                     : "text-muted-foreground"
                 }`}
               >
@@ -171,11 +171,11 @@ export function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="relative" asChild>
+          <Button variant="ghost" size="icon" className="relative cursor-pointer" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {isCartHydrated && totalQuantity > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[#c8a2ff] text-[#0f0f1a] text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lavender">
                   {totalQuantity}
                 </span>
               )}

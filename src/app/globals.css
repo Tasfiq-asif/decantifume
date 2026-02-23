@@ -163,9 +163,35 @@
 
   /* Elegant glass effect */
   .glass-effect {
-    background: rgba(26, 26, 46, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(200, 162, 255, 0.2);
+    background: rgba(26, 26, 46, 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(200, 162, 255, 0.15);
+  }
+
+  /* Glass card — consistent glassmorphism treatment */
+  .glass-card {
+    background: rgba(26, 26, 46, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(200, 162, 255, 0.1);
+    border-radius: 1rem;
+  }
+
+  /* Radial lavender background glow */
+  .bg-radial-lavender {
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(200, 162, 255, 0.15) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Subtle page glow */
+  .bg-subtle-glow {
+    background: radial-gradient(
+      ellipse at 30% 80%,
+      rgba(212, 179, 255, 0.08) 0%,
+      transparent 60%
+    );
   }
 
   /* Subtle glow effects */
@@ -175,6 +201,15 @@
 
   .glow-soft {
     box-shadow: 0 4px 20px rgba(200, 162, 255, 0.1);
+  }
+
+  /* Shadow utilities referenced by components */
+  .shadow-lavender {
+    box-shadow: 0 4px 24px rgba(200, 162, 255, 0.25);
+  }
+
+  .shadow-lavender-soft {
+    box-shadow: 0 2px 16px rgba(200, 162, 255, 0.12);
   }
 }
 

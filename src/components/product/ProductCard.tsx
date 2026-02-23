@@ -78,7 +78,7 @@ export const ProductCard = memo(function ProductCard({
     : product.price;
 
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:glow-soft cursor-pointer border-[rgba(200,162,255,0.08)] hover:border-[rgba(200,162,255,0.2)]">
       <div className="relative aspect-square overflow-hidden">
         <Image
           src={product.image}
@@ -90,12 +90,12 @@ export const ProductCard = memo(function ProductCard({
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
           {product.isNew && (
-            <Badge variant="default" className="bg-primary text-white text-xs">
+            <Badge variant="default" className="bg-[#c8a2ff] text-[#0f0f1a] text-xs font-semibold">
               New
             </Badge>
           )}
           {product.isBestSeller && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs font-semibold bg-[#2e2e4a] text-[#e6d9ff] border border-[#c8a2ff]/20">
               Best Seller
             </Badge>
           )}
