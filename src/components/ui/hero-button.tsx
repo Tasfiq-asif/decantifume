@@ -29,9 +29,9 @@ export function HeroButton({
 
   const variants = {
     primary:
-      "bg-lavender-gradient text-dark-purple-800 hover:shadow-lavender hover:scale-105",
+      "bg-lavender-gradient text-[#1a1a2e] hover:shadow-lavender hover:scale-105",
     secondary:
-      "text-lavender-200 border-lavender-400 hover:bg-lavender-400 hover:text-dark-purple-800 backdrop-blur-sm glass-effect border",
+      "text-[#e6d9ff] border-[#3d3d5c] hover:bg-[#c8a2ff]/10 hover:border-[#c8a2ff]/40 backdrop-blur-sm glass-effect border",
   };
 
   const sizes = {
